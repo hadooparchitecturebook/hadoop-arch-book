@@ -25,13 +25,13 @@ import java.util.Date;
 public final class JavaSessionize {
 
     public static final List<String> testLines = Lists.newArrayList(
-            "233.19.62.103 - 16261 [15/Sep/2013:23:55:57 +0100] \"GET /code.js HTTP/1.0\" 200 3667 " +
+            "233.19.62.103 - 16261 [15/Sep/2013:23:55:57] \"GET /code.js HTTP/1.0\" 200 3667 " +
                     "\"http://www.loudacre.com\"  \"Loudacre Mobile Browser Sorrento F10L\"",
-            "16.180.70.237 - 128 [15/Sep/2013:23:59:53 +0100] \"GET /KBDOC-00031.html HTTP/1.0\" 200 1388 " +
+            "16.180.70.237 - 128 [15/Sep/2013:23:59:53] \"GET /KBDOC-00031.html HTTP/1.0\" 200 1388 " +
                     "\"http://www.loudacre.com\"  \"Loudacre CSR Browser\"",
-            "116.180.70.237 - 128 [15/Sep/2013:23:59:53 +0100] \"GET /theme.css HTTP/1.0\" 200 5531 " +
+            "116.180.70.237 - 128 [15/Sep/2013:23:59:53] \"GET /theme.css HTTP/1.0\" 200 5531 " +
                     "\"http://www.loudacre.com\"  \"Loudacre CSR Browser\"",
-            "116.180.70.237 - 128 [15/Sep/2013:23:59:53 +0100] \"GET /theme.css HTTP/1.0\" 200 5531 "
+            "116.180.70.237 - 128 [15/Sep/2013:23:59:53] \"GET /theme.css HTTP/1.0\" 200 5531 "
                     + "\"http://www.loudacre.com\"  \"Loudacre CSR Browser\""
     );
 
@@ -104,7 +104,7 @@ public final class JavaSessionize {
         Matcher m = apacheLogRegex.matcher(line);
         if (m.find()) {
             String ip = m.group(1);
-            Date timeStamp = new SimpleDateFormat("dd/MMM/yyyy:hh:mm:ss Z").parse(m.group(2));
+            Date timeStamp = new SimpleDateFormat("dd/MMM/yyyy:hh:mm:ss").parse(m.group(2));
             String url = m.group(3);
             String referrer = m.group(6);
             String userAgent = m.group(7);
