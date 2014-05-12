@@ -87,26 +87,36 @@ public final class JavaSessionize {
 
     // get the IP of the click event, to use as a user identified
     public static String getIP(String line){
+        System.out.println("Line:" + line)  ;
+        System.out.println("regex:" + apacheLogRegex)  ;
         Matcher m = apacheLogRegex.matcher(line);
-        return m.group(1);
+        if (m.find())
+            return m.group(1);
+        else {
+            System.out.println("no match");
+            return "0";
+        }
     }
 
 
     // get all the relevant fields of the event
     public static LogLine getFields(String line) throws ParseException {
         Matcher m = apacheLogRegex.matcher(line);
-        String ip = m.group(1);
-        Date timeStamp = new SimpleDateFormat("dd/MMM/yyyy:hh:mm:ss Z").parse(m.group(2));
-        String url = m.group(3);
-        String referrer = m.group(6);
-        String userAgent = m.group(7);
-
-        return new LogLine(ip,timeStamp,url,referrer,userAgent);
+        if (m.find()) {
+            String ip = m.group(1);
+            Date timeStamp = new SimpleDateFormat("dd/MMM/yyyy:hh:mm:ss Z").parse(m.group(2));
+            String url = m.group(3);
+            String referrer = m.group(6);
+            String userAgent = m.group(7);
+            return new LogLine(ip,timeStamp,url,referrer,userAgent);
+        } else {
+            System.out.println("no match");
+            return new LogLine("0",new Date(),"","","");
+        }
     }
 
     public static List<LogLine> sessionize(List<LogLine> lines) {
-        List<LogLine> sessionizedLines = new ArrayList<LogLine>(lines.size());
-        Collections.copy(sessionizedLines,lines);
+        List<LogLine> sessionizedLines = new ArrayList<LogLine>(lines);
         Collections.sort(sessionizedLines);
         int sessionId = 0;
         sessionizedLines.get(0).sessionId = sessionId;
