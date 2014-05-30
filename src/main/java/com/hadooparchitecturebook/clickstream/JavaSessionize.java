@@ -1,4 +1,4 @@
-package com.apparchbook.clickstream;
+package com.hadooparchitecturebook.clickstream;
 
 import JavaSessionize.avro.LogLine;
 import com.google.common.collect.Lists;
