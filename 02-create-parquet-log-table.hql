@@ -6,8 +6,11 @@ CREATE TABLE if not exists apache_log_parquet(
         referrer        STRING,
         user_agent      STRING,
 	ts		BIGINT,
-	session_id	INT
-PARTITIONED BY (year int, month int, day int)
+	session_id	INT)
+PARTITIONED BY (
+	year            INT,
+	month 		INT,
+	day 		INT)
 ROW FORMAT SERDE 'parquet.hive.serde.ParquetHiveSerDe'
 STORED AS
 INPUTFORMAT "parquet.hive.DeprecatedParquetInputFormat"
