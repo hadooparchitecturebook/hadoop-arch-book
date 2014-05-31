@@ -1,17 +1,22 @@
 DROP TABLE raw_log;
  
--- I don't think timestamp is a good name for a column, changing it to ts since older versions of hive fail when creating a column with name ts.
 CREATE EXTERNAL TABLE raw_log(
-	IP		STRING,
-	ts		STRING,
-	URL		STRING,
-	referrer	STRING,
-	user_agent	STRING)
+        IP              STRING,
+        ts              STRING,
+        URL             STRING,
+        referrer        STRING,
+        user_agent      STRING)
+PARTITIONED BY (
+        year            INT,
+        month           INT,
+        day             INT)
 ROW FORMAT SERDE 'org.apache.hadoop.hive.contrib.serde2.RegexSerDe'
 WITH SERDEPROPERTIES (
-	"input.regex" = "(\\d+.\\d+.\\d+.\\d+).*\\[(.*)\\].*GET (\\S*).*\\d+ \\d+ (\\S+) \"(.*)\""
+        "input.regex" = "(\\d+.\\d+.\\d+.\\d+).*\\[(.*)\\].*GET (\\S*).*\\d+ \\d+ (\\S+) \"(.*)\""
 )
-location '/etl/bikeshop/clickstream/raw/year=2014/month=5/day=6'
-;
+LOCATION '/etl/bikeshop/clickstream/raw';
 
---select * from raw_log limit 5
+-- Need to be where generated access logs are
+LOAD DATA LOCAL INPATH 'access_log*.log' OVERWRITE INTO TABLE raw_log PARTITION (year=2014, month=10, day=10);
+
+SELECT * FROM raw_log LIMIT 5;
