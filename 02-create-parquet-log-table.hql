@@ -14,4 +14,5 @@ PARTITIONED BY (
 ROW FORMAT SERDE 'parquet.hive.serde.ParquetHiveSerDe'
 STORED AS
 INPUTFORMAT "parquet.hive.DeprecatedParquetInputFormat"
-OUTPUTFORMAT "parquet.hive.DeprecatedParquetOutputFormat";
+OUTPUTFORMAT "parquet.hive.DeprecatedParquetOutputFormat"
+LOCATION '/data/bikeshop/clickstream';
