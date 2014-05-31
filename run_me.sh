@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 hadoop fs -mkdir /etl/bikeshop/clickstream/raw
 
