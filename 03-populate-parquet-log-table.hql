@@ -1,3 +1,5 @@
+ADD JAR /opt/cloudera/parcels/CDH/lib/hive/lib/hive-contrib.jar;
+
 set hive.exec.dynamic.partition.mode=nonstrict;
 set hive.exec.dynamic.partition=true;
  
