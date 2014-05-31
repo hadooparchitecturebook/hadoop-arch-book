@@ -4,7 +4,7 @@ import datetime
 import random
 timestr = time.strftime("%Y%m%d-%H%M%S")
 
-otime = datetime.datetime(2013, 10, 10, 01, 30, 27)
+otime = datetime.datetime(2014, 10, 10, 01, 30, 27)
 timestr =  time.strftime("%Y%m%d-%H%M%S", otime.timetuple())
 
 f = open('access_log_'+timestr+'.log','w')
