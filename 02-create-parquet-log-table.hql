@@ -6,9 +6,10 @@ CREATE TABLE if not exists apache_log_parquet(
         referrer        STRING,
         user_agent      STRING,
 	ts		BIGINT,
-	session_id	INT
+	session_id	INT)
 PARTITIONED BY (year int, month int, day int)
 ROW FORMAT SERDE 'parquet.hive.serde.ParquetHiveSerDe'
 STORED AS
 INPUTFORMAT "parquet.hive.DeprecatedParquetInputFormat"
-OUTPUTFORMAT "parquet.hive.DeprecatedParquetOutputFormat";
+OUTPUTFORMAT "parquet.hive.DeprecatedParquetOutputFormat"
+LOCATION '/data/bikeshop/clickstream';
