@@ -1,4 +1,3 @@
 Fraud-Example
 =============
-
-Blah Blah
+Example of Fraud Detection use case described in Chapter 7.
