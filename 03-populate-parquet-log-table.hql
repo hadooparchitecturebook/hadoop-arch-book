@@ -17,4 +17,4 @@ FROM (
         FROM raw_log
 ) t) s; 
  
--- SELECT * FROM apache_log_parquet limit 5;
+-- SELECT * FROM apache_log_parquet LIMIT 5;
