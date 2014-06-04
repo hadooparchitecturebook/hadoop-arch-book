@@ -196,6 +196,7 @@ public final class JavaSessionize {
             }
         });
 
+        // This groups clicks by IP address
         JavaPairRDD<String,List<SerializableLogLine>> grouped = parsed.groupByKey();
 
         JavaPairRDD<String,List<SerializableLogLine>> sessionized = grouped.mapValues(new Function<List<SerializableLogLine>, List<SerializableLogLine>>() {
