@@ -15,3 +15,6 @@ hs_err_pid*
 /.idea
 /.idea/workspace.xml
 *.iws
+
+#Target
+target/
