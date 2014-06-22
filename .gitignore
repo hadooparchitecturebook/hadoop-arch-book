@@ -13,3 +13,4 @@ hs_err_pid*
 
 #Some of the .idea files
 /.idea/workspace.xml
+*.iws
