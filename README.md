@@ -3,7 +3,7 @@ MRSessionize
 
 Sessionize code written in MapReduce
 
-I also had to copy joda-time jar to HADOOP_HOME/lib.
+I also had to copy joda-time jar to HADOOP_HOME/lib :-(.
 
 Run the code with something a command like this:
 <pre>
