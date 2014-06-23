@@ -56,21 +56,22 @@ public class MRSessionize {
             extends Reducer<Text, Text, Text, Text> {
         private Text result = new Text();
         private static int sessionId = 0;
-        private static DateTime lastTimeStamp = null;
-
-        //private
+        private DateTime lastTimeStamp = null;
 
         public void reduce(Text key, Iterable<Text> values,
                            Context context
         ) throws IOException, InterruptedException {
-            private Matcher logRecordMatcher;
-            for (Text logRecord : values) {
-                logRecordMatcher = logRecordPattern.matcher(logRecord.toString());
+            for (Text value : values) {
+                String logRecord = value.toString();
+                Matcher logRecordMatcher = logRecordPattern.matcher(logRecord);
                 DateTime timestamp = DateTime.parse(logRecordMatcher.group(2), TIMESTAMP_FORMATTER);
-                if (lastTimeStamp == null || timestamp.getMillis() - lastTimeStamp.getMillis() >)
+                if (lastTimeStamp == null || (timestamp.getMillis() - lastTimeStamp.getMillis() > SESSION_TIMEOUT_IN_MS)) {
+                    sessionId++;
+                }
+                lastTimeStamp = timestamp;
+                result.set(logRecord + " " + sessionId);
+                context.write(null, result);
             }
-            result.set("");
-            context.write(key, result);
         }
     }
 
