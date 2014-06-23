@@ -71,7 +71,7 @@ public class MRSessionize {
                 }
                 lastTimeStamp = key.getUnixTimestamp();
                 result.set(logRecord + " " + sessionId);
-                context.write(key, result);
+                context.write(null, result);
             }
         }
     }
@@ -95,7 +95,7 @@ public class MRSessionize {
 
         job.setMapOutputKeyClass(IpTimestampKey.class);
         job.setMapOutputValueClass(Text.class);
-        job.setOutputKeyClass(IpTimestampKey.class);
+        job.setOutputKeyClass(NullWritable.class);
         job.setOutputValueClass(Text.class);
 
         job.setPartitionerClass(NaturalKeyPartitioner.class);
