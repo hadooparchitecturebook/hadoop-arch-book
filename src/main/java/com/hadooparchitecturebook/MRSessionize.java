@@ -45,7 +45,8 @@ public class MRSessionize {
 
             if (logRecordMatcher.matches()) {
                 String ip = logRecordMatcher.group(1);
-                Long unixTimestamp = Long.parseLong(logRecordMatcher.group(2));
+                DateTime timestamp = DateTime.parse(logRecordMatcher.group(2), TIMESTAMP_FORMATTER);
+                Long unixTimestamp = timestamp.getMillis();
                 IpTimestampKey outputKey = new IpTimestampKey(ip, unixTimestamp);
                 context.write(outputKey, value);
             }
@@ -54,22 +55,20 @@ public class MRSessionize {
     }
 
     public static class SessionizeReducer
-            extends Reducer<Text, Text, Text, Text> {
+            extends Reducer<IpTimestampKey, Text, Text, Text> {
         private Text result = new Text();
         private static int sessionId = 0;
-        private DateTime lastTimeStamp = null;
+        private Long lastTimeStamp = null;
 
-        public void reduce(Text key, Iterable<Text> values,
+        public void reduce(IpTimestampKey key, Iterable<Text> values,
                            Context context
         ) throws IOException, InterruptedException {
             for (Text value : values) {
                 String logRecord = value.toString();
-                Matcher logRecordMatcher = logRecordPattern.matcher(logRecord);
-                DateTime timestamp = DateTime.parse(logRecordMatcher.group(2), TIMESTAMP_FORMATTER);
-                if (lastTimeStamp == null || (timestamp.getMillis() - lastTimeStamp.getMillis() > SESSION_TIMEOUT_IN_MS)) {
+                if (lastTimeStamp == null || (key.getUnixTimestamp() - lastTimeStamp > SESSION_TIMEOUT_IN_MS)) {
                     sessionId++;
                 }
-                lastTimeStamp = timestamp;
+                lastTimeStamp = key.getUnixTimestamp();
                 result.set(logRecord + " " + sessionId);
                 context.write(null, result);
             }
