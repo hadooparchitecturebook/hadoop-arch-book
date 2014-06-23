@@ -95,7 +95,7 @@ public class MRSessionize {
 
         job.setMapOutputKeyClass(IpTimestampKey.class);
         job.setMapOutputValueClass(Text.class);
-        job.setOutputKeyClass(NullWritable.class);
+        job.setOutputKeyClass(IpTimestampKey.class);
         job.setOutputValueClass(Text.class);
 
         job.setPartitionerClass(NaturalKeyPartitioner.class);
