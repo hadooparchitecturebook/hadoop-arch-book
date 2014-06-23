@@ -56,7 +56,7 @@ public class MRSessionize {
 
     // TODO: NEED TO BUNDLE JODA TIME IN ASSEMBLY
     public static class SessionizeReducer
-            extends Reducer<IpTimestampKey, Text, Text, Text> {
+            extends Reducer<IpTimestampKey, Text, IpTimestampKey, Text> {
         private Text result = new Text();
         private static int sessionId = 0;
         private Long lastTimeStamp = null;
@@ -71,7 +71,7 @@ public class MRSessionize {
                 }
                 lastTimeStamp = key.getUnixTimestamp();
                 result.set(logRecord + " " + sessionId);
-                context.write(null, result);
+                context.write(key, result);
             }
         }
     }
