@@ -10,10 +10,10 @@ import java.util.regex.Pattern;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.*;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Partitioner;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
@@ -34,10 +34,9 @@ public class MRSessionize {
     private static final int SESSION_TIMEOUT_IN_MINUTES = 30;
     private static final int SESSION_TIMEOUT_IN_MS = SESSION_TIMEOUT_IN_MINUTES * 60 * 1000;
 
-    public static class TokenizerMapper
-            extends Mapper<Object, Text, Text, Text> {
+    public static class SessionizeMapper
+            extends Mapper<Object, Text, IpTimestampKey, Text> {
 
-        private Text ip = new Text();
         private Matcher logRecordMatcher;
 
         public void map(Object key, Text value, Context context
@@ -45,14 +44,16 @@ public class MRSessionize {
             logRecordMatcher = logRecordPattern.matcher(value.toString());
 
             if (logRecordMatcher.matches()) {
-                ip.set(logRecordMatcher.group(1));
-                context.write(ip, value);
+                String ip = logRecordMatcher.group(1);
+                Long unixTimestamp = Long.parseLong(logRecordMatcher.group(2));
+                IpTimestampKey outputKey = new IpTimestampKey(ip, unixTimestamp);
+                context.write(outputKey, value);
             }
 
         }
     }
 
-    public static class IntSumReducer
+    public static class SessionizeReducer
             extends Reducer<Text, Text, Text, Text> {
         private Text result = new Text();
         private static int sessionId = 0;
@@ -84,13 +85,61 @@ public class MRSessionize {
         }
         Job job = new Job(conf, "MRSessionize");
         job.setJarByClass(MRSessionize.class);
-        job.setMapperClass(TokenizerMapper.class);
-        job.setCombinerClass(IntSumReducer.class);
-        job.setReducerClass(IntSumReducer.class);
-        job.setOutputKeyClass(Text.class);
-        job.setOutputValueClass(IntWritable.class);
+        job.setMapperClass(SessionizeMapper.class);
+        // WARNING: do NOT set the Combiner class
+        // from the same IP in one place before we can do sessionization
+        // Also, our reducer doesn't return the same key,value types it takes
+        // It can't be used on the result of a previous reducer
+        job.setReducerClass(SessionizeReducer.class);
+        job.setOutputKeyClass(null);
+        job.setOutputValueClass(Text.class);
+
+        job.setPartitionerClass(NaturalKeyPartitioner.class);
+        job.setGroupingComparatorClass(NaturalKeyComparator.class);
+        job.setSortComparatorClass(CompositeKeyComparator.class);
+
         FileInputFormat.addInputPath(job, new Path(otherArgs[0]));
         FileOutputFormat.setOutputPath(job, new Path(otherArgs[1]));
         System.exit(job.waitForCompletion(true) ? 0 : 1);
+    }
+
+    private class NaturalKeyComparator extends WritableComparator {
+        protected NaturalKeyComparator() {
+            super(IpTimestampKey.class, true);
+        }
+
+        @Override
+        public int compare(WritableComparable r1, WritableComparable r2) {
+            IpTimestampKey key1 = (IpTimestampKey) r1;
+            IpTimestampKey key2 = (IpTimestampKey) r2;
+
+            return key1.getIp().compareTo(key2.getIp());
+        }
+    }
+
+    private class CompositeKeyComparator extends WritableComparator {
+        protected CompositeKeyComparator() {
+            super(IpTimestampKey.class, true);
+        }
+
+        @Override
+        public int compare(WritableComparable r1, WritableComparable r2) {
+            IpTimestampKey key1 = (IpTimestampKey) r1;
+            IpTimestampKey key2 = (IpTimestampKey) r2;
+
+            int result = key1.getIp().compareTo(key2.getIp());
+            if (result == 0) {
+                result = key1.getUnixTimestamp().compareTo(key2.getUnixTimestamp());
+            }
+            return result;
+        }
+    }
+
+    private class NaturalKeyPartitioner extends Partitioner<IpTimestampKey, Text> {
+
+        @Override
+        public int getPartition(IpTimestampKey key, Text value, int numPartitions) {
+            return key.getIp().hashCode() % numPartitions;
+        }
     }
 }
