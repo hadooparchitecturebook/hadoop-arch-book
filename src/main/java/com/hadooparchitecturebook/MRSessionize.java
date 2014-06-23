@@ -5,7 +5,8 @@
 package com.hadooparchitecturebook;
 
 import java.io.IOException;
-import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -18,35 +19,57 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
 
-public class MRSessionize {
-    public static class TokenizerMapper
-            extends Mapper<Object, Text, Text, IntWritable> {
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
-        private final static IntWritable one = new IntWritable(1);
-        private Text word = new Text();
+public class MRSessionize {
+    private static final String LOG_RECORD_REGEX =
+            "(\\\\d+.\\\\d+.\\\\d+.\\\\d+).*\\\\[(.*)\\\\].*GET (\\\\S*).*\\\\d+ \\\\d+ (\\\\S+) \\\"(.*)\\\"";
+    private static final Pattern logRecordPattern = Pattern.compile(LOG_RECORD_REGEX);
+
+    private static final String TIMESTAMP_PATTERN = "dd/MMM/yyyy:HH:mm:ss";
+    private static final DateTimeFormatter TIMESTAMP_FORMATTER = DateTimeFormat.forPattern(TIMESTAMP_PATTERN);
+
+    private static final int SESSION_TIMEOUT_IN_MINUTES = 30;
+    private static final int SESSION_TIMEOUT_IN_MS = SESSION_TIMEOUT_IN_MINUTES * 60 * 1000;
+
+    public static class TokenizerMapper
+            extends Mapper<Object, Text, Text, Text> {
+
+        private Text ip = new Text();
+        private Matcher logRecordMatcher;
 
         public void map(Object key, Text value, Context context
         ) throws IOException, InterruptedException {
-            StringTokenizer itr = new StringTokenizer(value.toString());
-            while (itr.hasMoreTokens()) {
-                word.set(itr.nextToken());
-                context.write(word, one);
+            logRecordMatcher = logRecordPattern.matcher(value.toString());
+
+            if (logRecordMatcher.matches()) {
+                ip.set(logRecordMatcher.group(1));
+                context.write(ip, value);
             }
+
         }
     }
 
     public static class IntSumReducer
-            extends Reducer<Text, IntWritable, Text, IntWritable> {
-        private IntWritable result = new IntWritable();
+            extends Reducer<Text, Text, Text, Text> {
+        private Text result = new Text();
+        private static int sessionId = 0;
+        private static DateTime lastTimeStamp = null;
 
-        public void reduce(Text key, Iterable<IntWritable> values,
+        //private
+
+        public void reduce(Text key, Iterable<Text> values,
                            Context context
         ) throws IOException, InterruptedException {
-            int sum = 0;
-            for (IntWritable val : values) {
-                sum += val.get();
+            private Matcher logRecordMatcher;
+            for (Text logRecord : values) {
+                logRecordMatcher = logRecordPattern.matcher(logRecord.toString());
+                DateTime timestamp = DateTime.parse(logRecordMatcher.group(2), TIMESTAMP_FORMATTER);
+                if (lastTimeStamp == null || timestamp.getMillis() - lastTimeStamp.getMillis() >)
             }
-            result.set(sum);
+            result.set("");
             context.write(key, result);
         }
     }
@@ -55,10 +78,10 @@ public class MRSessionize {
         Configuration conf = new Configuration();
         String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
         if (otherArgs.length != 2) {
-            System.err.println("Usage: wordcount <in> <out>");
+            System.err.println("Usage: MRSessionize <in> <out>");
             System.exit(2);
         }
-        Job job = new Job(conf, "word count");
+        Job job = new Job(conf, "MRSessionize");
         job.setJarByClass(MRSessionize.class);
         job.setMapperClass(TokenizerMapper.class);
         job.setCombinerClass(IntSumReducer.class);

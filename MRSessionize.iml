@@ -106,6 +106,7 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.hadoop:hadoop-yarn-server-tests:test-jar:tests:2.0.0-cdh4.5.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.hadoop:hadoop-yarn-server-resourcemanager:2.0.0-cdh4.5.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.mrunit:mrunit:hadoop023:0.8.1-incubating" level="project" />
+    <orderEntry type="library" name="Maven: joda-time:joda-time:2.3" level="project" />
   </component>
 </module>
 
