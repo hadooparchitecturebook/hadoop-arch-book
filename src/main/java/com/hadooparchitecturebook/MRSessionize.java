@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.*;
@@ -85,13 +86,17 @@ public class MRSessionize {
         Job job = new Job(conf, "MRSessionize");
         job.setJarByClass(MRSessionize.class);
         job.setMapperClass(SessionizeMapper.class);
+        job.setReducerClass(SessionizeReducer.class);
+
         // WARNING: do NOT set the Combiner class
         // from the same IP in one place before we can do sessionization
         // Also, our reducer doesn't return the same key,value types it takes
         // It can't be used on the result of a previous reducer
-        job.setReducerClass(SessionizeReducer.class);
-        //job.setOutputKeyClass(null);
-        //job.setOutputValueClass(Text.class);
+
+        job.setMapOutputKeyClass(IpTimestampKey.class);
+        job.setMapOutputValueClass(Text.class);
+        job.setOutputKeyClass(NullWritable.class);
+        job.setOutputValueClass(Text.class);
 
         job.setPartitionerClass(NaturalKeyPartitioner.class);
         job.setGroupingComparatorClass(NaturalKeyComparator.class);
