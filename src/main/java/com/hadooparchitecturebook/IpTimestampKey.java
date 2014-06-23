@@ -8,8 +8,10 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 /**
- * Created by mgrover on 6/22/14.
- */ // To be used as output of Mappers and input to reducers
+ * The composite key to be used for the map output key and the reduce input key.
+ * We need this composite key because we want to do secondary sorting on the data entering the reducers
+ * based on the timestamps. For more details, refer to the main() of the MRSessionize.java
+ */
 public class IpTimestampKey implements WritableComparable<IpTimestampKey> {
     private String ip;
     private Long unixTimestamp;

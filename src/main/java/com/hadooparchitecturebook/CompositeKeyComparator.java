@@ -5,7 +5,8 @@ import org.apache.hadoop.io.WritableComparator;
 import com.hadooparchitecturebook.IpTimestampKey;
 
 /**
- * Created by mgrover on 6/22/14.
+ * This comparator gets used as the Sort Comparator in the MR job. It takes both (ip address, timestamp) into account,
+ * so the records when they go to the reducer are sorted in ascending order of timestamp for each ip address.
  */
 public class CompositeKeyComparator extends WritableComparator {
     CompositeKeyComparator() {

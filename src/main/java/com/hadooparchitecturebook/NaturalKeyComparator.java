@@ -5,7 +5,9 @@ import org.apache.hadoop.io.WritableComparator;
 import com.hadooparchitecturebook.IpTimestampKey;
 
 /**
-* Created by mgrover on 6/22/14.
+* This comparator is used during the shuffle process. This only considers the natural key part (i.e. just the IP address)
+ * of the composite key. We only want to shuffle by the ip address, hence the compare() only takes the IP address
+ * into account.
 */
 public class NaturalKeyComparator extends WritableComparator {
     NaturalKeyComparator() {
