@@ -10,7 +10,7 @@ import java.io.IOException;
 /**
  * Created by mgrover on 6/22/14.
  */ // To be used as output of Mappers and input to reducers
-class IpTimestampKey implements WritableComparable<IpTimestampKey> {
+public class IpTimestampKey implements WritableComparable<IpTimestampKey> {
     private String ip;
     private Long unixTimestamp;
 

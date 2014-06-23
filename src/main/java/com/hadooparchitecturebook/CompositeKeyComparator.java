@@ -6,7 +6,7 @@ import org.apache.hadoop.io.WritableComparator;
 /**
 * Created by mgrover on 6/22/14.
 */
-class CompositeKeyComparator extends WritableComparator {
+public class CompositeKeyComparator extends WritableComparator {
     CompositeKeyComparator() {
         super(IpTimestampKey.class, true);
     }

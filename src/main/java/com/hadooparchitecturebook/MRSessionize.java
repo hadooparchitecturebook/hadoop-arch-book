@@ -53,6 +53,7 @@ public class MRSessionize {
         }
     }
 
+    // TODO: NEED TO BUNDLE JODA TIME IN ASSEMBLY
     public static class SessionizeReducer
             extends Reducer<IpTimestampKey, Text, Text, Text> {
         private Text result = new Text();
