@@ -93,10 +93,10 @@ public class MRSessionize {
         // Also, our reducer doesn't return the same key,value types it takes
         // It can't be used on the result of a previous reducer
 
-//        job.setMapOutputKeyClass(IpTimestampKey.class);
-//        job.setMapOutputValueClass(Text.class);
-//        job.setOutputKeyClass(NullWritable.class);
-//        job.setOutputValueClass(Text.class);
+        job.setMapOutputKeyClass(IpTimestampKey.class);
+        job.setMapOutputValueClass(Text.class);
+        job.setOutputKeyClass(NullWritable.class);
+        job.setOutputValueClass(Text.class);
 
         job.setPartitionerClass(NaturalKeyPartitioner.class);
         job.setGroupingComparatorClass(NaturalKeyComparator.class);
