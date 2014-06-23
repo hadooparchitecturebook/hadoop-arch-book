@@ -13,7 +13,6 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.*;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.Partitioner;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
@@ -102,43 +101,4 @@ public class MRSessionize {
         System.exit(job.waitForCompletion(true) ? 0 : 1);
     }
 
-    private class NaturalKeyComparator extends WritableComparator {
-        protected NaturalKeyComparator() {
-            super(IpTimestampKey.class, true);
-        }
-
-        @Override
-        public int compare(WritableComparable r1, WritableComparable r2) {
-            IpTimestampKey key1 = (IpTimestampKey) r1;
-            IpTimestampKey key2 = (IpTimestampKey) r2;
-
-            return key1.getIp().compareTo(key2.getIp());
-        }
-    }
-
-    private class CompositeKeyComparator extends WritableComparator {
-        protected CompositeKeyComparator() {
-            super(IpTimestampKey.class, true);
-        }
-
-        @Override
-        public int compare(WritableComparable r1, WritableComparable r2) {
-            IpTimestampKey key1 = (IpTimestampKey) r1;
-            IpTimestampKey key2 = (IpTimestampKey) r2;
-
-            int result = key1.getIp().compareTo(key2.getIp());
-            if (result == 0) {
-                result = key1.getUnixTimestamp().compareTo(key2.getUnixTimestamp());
-            }
-            return result;
-        }
-    }
-
-    private class NaturalKeyPartitioner extends Partitioner<IpTimestampKey, Text> {
-
-        @Override
-        public int getPartition(IpTimestampKey key, Text value, int numPartitions) {
-            return key.getIp().hashCode() % numPartitions;
-        }
-    }
 }
