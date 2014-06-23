@@ -25,7 +25,7 @@ import org.joda.time.format.DateTimeFormatter;
 
 public class MRSessionize {
     private static final String LOG_RECORD_REGEX =
-            "(\\\\d+.\\\\d+.\\\\d+.\\\\d+).*\\\\[(.*)\\\\].*GET (\\\\S*).*\\\\d+ \\\\d+ (\\\\S+) \\\"(.*)\\\"";
+            "(\\d+.\\d+.\\d+.\\d+).*\\[(.*)\\].*GET (\\S*).*\\d+ \\d+ (\\S+) \\\"(.*)\\\"";
     private static final Pattern logRecordPattern = Pattern.compile(LOG_RECORD_REGEX);
 
     private static final String TIMESTAMP_PATTERN = "dd/MMM/yyyy:HH:mm:ss";
