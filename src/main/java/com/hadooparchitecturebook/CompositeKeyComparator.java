@@ -2,10 +2,11 @@ package com.hadooparchitecturebook;
 
 import org.apache.hadoop.io.WritableComparable;
 import org.apache.hadoop.io.WritableComparator;
+import com.hadooparchitecturebook.IpTimestampKey;
 
 /**
-* Created by mgrover on 6/22/14.
-*/
+ * Created by mgrover on 6/22/14.
+ */
 public class CompositeKeyComparator extends WritableComparator {
     CompositeKeyComparator() {
         super(IpTimestampKey.class, true);

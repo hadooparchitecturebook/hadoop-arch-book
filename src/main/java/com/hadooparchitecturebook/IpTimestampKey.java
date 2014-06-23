@@ -14,6 +14,9 @@ public class IpTimestampKey implements WritableComparable<IpTimestampKey> {
     private String ip;
     private Long unixTimestamp;
 
+    IpTimestampKey() {
+    }
+
     IpTimestampKey(String ip, Long unixTimestamp) {
         this.ip = ip;
         this.unixTimestamp = unixTimestamp;
