@@ -12,7 +12,7 @@ PARTITIONED BY (
         day             INT)
 ROW FORMAT SERDE 'org.apache.hadoop.hive.contrib.serde2.RegexSerDe'
 WITH SERDEPROPERTIES (
-        "input.regex" = "(\\d+.\\d+.\\d+.\\d+).*\\[(.*)\\].*GET (\\S*).*\\d+ \\d+ (\\S+) \"(.*)\""
+        "input.regex" = "(\\d+.\\d+.\\d+.\\d+).*\\[(.*) \\].*GET (\\S*).*\\d+ \\d+ (\\S+) \"(.*)\""
 )
 LOCATION '/etl/bikeshop/clickstream/raw';
 

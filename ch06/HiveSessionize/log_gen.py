@@ -17,7 +17,7 @@ useragents=["Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0)","Mozilla/5.0 (M
 
 
 for i in xrange(0,500):
-        increment = datetime.timedelta(seconds=random.randint(30,300))
+        increment = datetime.timedelta(seconds=random.randint(30,3000))
         otime += increment
         uri = random.choice(resources)
         if uri.find("Store")>0:

@@ -1,4 +1,4 @@
-ch06
-====
+HiveSessionize
+==============
 
-Chapter 6 for Hadoop Application Architectures book
+Sessionization in Hive
