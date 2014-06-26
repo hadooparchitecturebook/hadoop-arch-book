@@ -69,6 +69,7 @@ public class MRSessionize {
     public static class SessionizeReducer
             extends Reducer<IpTimestampKey, Text, IpTimestampKey, Text> {
         private Text result = new Text();
+        // TODO: This doesn't work. Use UUID? Use 12 digits of IP address + a counter?
         private static int sessionId = 0;
         private Long lastTimeStamp = null;
 
