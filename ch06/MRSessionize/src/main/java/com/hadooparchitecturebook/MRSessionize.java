@@ -69,13 +69,15 @@ public class MRSessionize {
     public static class SessionizeReducer
             extends Reducer<IpTimestampKey, Text, IpTimestampKey, Text> {
         private Text result = new Text();
-        // TODO: This doesn't work. Use UUID? Use 12 digits of IP address + a counter?
-        private static int sessionId = 0;
-        private Long lastTimeStamp = null;
 
         public void reduce(IpTimestampKey key, Iterable<Text> values,
                            Context context
         ) throws IOException, InterruptedException {
+            // The sessionId generated here is per day, per IP. So, any queries
+            // that will be done as if this session ID were global, would require
+            // a combination of the day in question and IP as well.
+            int sessionId = 0;
+            Long lastTimeStamp = null;
             for (Text value : values) {
                 String logRecord = value.toString();
                 // If this is the first record for this user or it's been more than the timeout since
