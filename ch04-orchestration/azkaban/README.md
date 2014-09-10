@@ -1,4 +1,4 @@
-azkaban-jobs
-============
+azkaban
+=======
 
 Few example jobs for Azkaban
