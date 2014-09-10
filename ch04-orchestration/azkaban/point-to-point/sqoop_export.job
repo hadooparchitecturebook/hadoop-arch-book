@@ -1,0 +1,4 @@
+type=command
+command=sqoop export --connect jdbc:oracle:thin:@(DESCRIPTION = (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = orahost)(PORT = 1521)))(SDU = 5844)(CONNECT_DATA = (ORACLE_SID = oracle))) --username scott--password tiger --table mytable --export-dir=/user/hive/warehouse/agg_results
+
+dependencies=hive_populate

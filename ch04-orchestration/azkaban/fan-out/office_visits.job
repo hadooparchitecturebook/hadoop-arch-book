@@ -1,0 +1,5 @@
+type=hive
+hive.script=${scripts}/visits.hql
+user.to.proxy=hive
+
+dependencies=preliminary_statistics

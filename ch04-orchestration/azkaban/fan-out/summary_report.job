@@ -1,0 +1,5 @@
+type=hive
+hive.script=${scripts}/summary_report.hql
+user.to.proxy=hive
+
+dependencies=prescriptions_and_refills, office_visits, lab_results

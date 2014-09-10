@@ -1,0 +1,4 @@
+type=command
+command=bash process_data_OR_validation_failure.sh
+
+dependencies=validate

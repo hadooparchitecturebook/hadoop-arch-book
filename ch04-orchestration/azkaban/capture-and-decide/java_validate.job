@@ -1,0 +1,13 @@
+type=javaprocess
+java.class=org.apache.hadoop.examples.ExampleDriver
+
+hadoop.home=/opt/cloudera/parcels/CDH/lib/hadoop
+hadoop.mapred.home=/opt/cloudera/parcels/CDH/lib/hadoop-mapreduce
+hadoop.yarn.home=/opt/cloudera/parcels/CDH/lib/hadoop-yarn
+hadoop.hdfs.home=/opt/cloudera/parcels/CDH/lib/hadoop-hdfs
+hadoop.conf.dir=/etc/hadoop/conf
+
+classpath=${hadoop.home}/*,${hadoop.home}/lib/*,${hadoop.mapred.home}/*,${hadoop.mapred.home}/lib/*,${hadoop.yarn.home}/*,${hadoop.yarn.home}/lib/*,${hadoop.hdfs.home}/*,${hadoop.hdfs.home}/lib/*,${hadoop.conf.dir}
+method.run=main
+main.args=wordcount /user/hive/warehouse/table1/data.txt /tmp/wordcount
+
