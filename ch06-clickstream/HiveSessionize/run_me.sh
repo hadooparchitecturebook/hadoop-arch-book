@@ -1,7 +1,7 @@
 #!/bin/bash -x
 
-sudo -u hdfs hadoop fs -mkdir -p /etl/bikeshop/clickstream/raw
-sudo -u hdfs hadoop fs -chmod 1777 /etl/bikeshop/clickstream/raw
+sudo -u hdfs hadoop fs -mkdir -p /etl/BI/casualcyclist/clicks/rawlogs
+sudo -u hdfs hadoop fs -chmod 1777 /etl/BI/casualcyclist/clicks/rawlogs
 
 sudo -u hdfs hadoop fs -mkdir -p /data/bikeshop/clickstream
 sudo -u hdfs hadoop fs -chmod 1777 /data/bikeshop/clickstream

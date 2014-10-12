@@ -14,7 +14,7 @@ ROW FORMAT SERDE 'org.apache.hadoop.hive.contrib.serde2.RegexSerDe'
 WITH SERDEPROPERTIES (
         "input.regex" = "(\\d+.\\d+.\\d+.\\d+).*\\[(.*) \\].*GET (\\S*).*\\d+ \\d+ (\\S+) \"(.*)\""
 )
-LOCATION '/etl/bikeshop/clickstream/raw';
+LOCATION '/etl/BI/casualcyclist/clicks/rawlogs';
 
 -- Need to be where generated access logs are
 LOAD DATA LOCAL INPATH 'access_log*.log' OVERWRITE INTO TABLE raw_log PARTITION (year=2014, month=10, day=10);
