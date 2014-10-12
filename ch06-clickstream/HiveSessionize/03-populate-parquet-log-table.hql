@@ -1,6 +1,6 @@
 -- This query makes use of Windowing functions in Hive which are only available in
 -- Apache Hive 0.11+, CDH 5.0.0+, etc.
-ADD JAR /opt/cloudera/parcels/CDH/lib/hive/lib/hive-contrib.jar;
+ADD JAR /usr/lib/hive/lib/hive-contrib.jar;
 
 SET hive.exec.dynamic.partition.mode=nonstrict;
 SET hive.exec.dynamic.partition=true;
