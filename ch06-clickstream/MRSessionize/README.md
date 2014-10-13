@@ -8,6 +8,6 @@ Sessionization code written in MapReduce
 2. Run the code with something a command like this:
 <pre>
 <code>
-hadoop jar ~/MRSessionize/target/MRSessionize-1.0-SNAPSHOT.jar com.hadooparchitecturebook.MRSessionize -libjars ~/joda-time-2.3.jar /etl/bikeshop/clickstream/raw/year=2013/month=10/day=10/access_log_20141010-013027.log /tmp/sessionize
+hadoop jar ./target/MRSessionize-1.0-SNAPSHOT.jar com.hadooparchitecturebook.MRSessionize /etl/BI/casualcyclist/clicks/deduplogs/year=2014/month=10/day=10/* /data/bikeshop/clickstream/year=2014/month=10/day=10
 </code>
 </pre>
