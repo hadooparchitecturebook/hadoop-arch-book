@@ -8,7 +8,6 @@ import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.generated.StormTopology;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
-import backtype.storm.utils.Utils;
 import com.hadooparchitecturebook.movingavg.topology.CalcMovingAvgBolt;
 import com.hadooparchitecturebook.movingavg.topology.ParseTicksBolt;
 import com.hadooparchitecturebook.movingavg.topology.StockTicksSpout;
@@ -24,12 +23,9 @@ import org.apache.storm.hdfs.bolt.rotation.FileSizeRotationPolicy;
 import org.apache.storm.hdfs.bolt.rotation.TimedRotationPolicy;
 import org.apache.storm.hdfs.bolt.sync.CountSyncPolicy;
 import org.apache.storm.hdfs.bolt.sync.SyncPolicy;
-import org.apache.storm.hdfs.common.rotation.MoveFileAction;
 
 /**
  * Create topology to calculate moving averages over stock data.
- *
- * TODO: move HDFS, etc. params to config file.
  */
 public class MovingAvgLocalTopologyRunner {
 
@@ -80,13 +76,13 @@ public class MovingAvgLocalTopologyRunner {
    */
   private static HdfsBolt createHdfsBolt() {
 
-    // use "|" instead of "," for field delimiter:
+    // Use "|" instead of "," for field delimiter:
     RecordFormat format = new DelimitedRecordFormat()
       .withFieldDelimiter("|");
     // sync the filesystem after every 1k tuples:
     SyncPolicy syncPolicy = new CountSyncPolicy(100);
 
-    // rotate files when they reach 5MB:
+    // Rotate files when they reach 5MB:
     FileRotationPolicy rotationPolicy = 
       new FileSizeRotationPolicy(5.0f, Units.MB);
 

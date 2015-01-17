@@ -23,11 +23,6 @@ public class MovingAvgLocalTopologyRunner {
     
     TridentTopology topology = new TridentTopology();
 
-    //    Stream movingAvgStream = topology.newStream("ticks-spout", buildSpout())
-    //.each(new Fields("stock-ticks"), new TickParser(), new Fields("price"));
-
-    
-    //TridentState movingAvg = 
     Stream movingAvgStream =
       topology.newStream("ticks-spout", buildSpout())
       .each(new Fields("stock-ticks"), new TickParser(), new Fields("price"))
