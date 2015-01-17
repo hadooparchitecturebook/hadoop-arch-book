@@ -20,18 +20,11 @@ public class CalculateAverage extends BaseAggregator <CalculateAverage.AverageSt
 
   @Override
   public void aggregate(AverageState state, TridentTuple tuple, TridentCollector collector) {
-    try {
-      System.out.println("CA.aggregate() value=" + tuple.getValue(0));
-      state.sum = state.sum + Double.valueOf((Double)tuple.getValue(0));
-    } catch(Exception e) {
-      System.out.println(e.getMessage());
-    }
-    //state.sum = state.sum + tuple.getValue(0).doubleValue();
+    state.sum = state.sum + Double.valueOf((Double)tuple.getValue(0));
   }
   
   @Override
   public void complete(AverageState state, TridentCollector collector) {
-    System.out.println("CA.complete() sum=" + state.sum + " avg=" + state.sum/5);
     collector.emit(new Values(state.sum/5));
   }
 }
