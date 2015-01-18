@@ -14,7 +14,6 @@ public class CalculateAverage extends BaseAggregator <CalculateAverage.AverageSt
 
   @Override
   public AverageState init(Object batchId, TridentCollector collector) {
-    System.out.println("CA.init() batchId=" + batchId);
     return new AverageState();
   }
 
