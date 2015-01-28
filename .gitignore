@@ -18,6 +18,3 @@ hs_err_pid*
 
 #Target
 target/
-
-#IntelliJ
-*.iml
