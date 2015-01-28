@@ -1,3 +1,3 @@
-ch07
+ch10
 ====
-Example of Fraud Detection use case described in Chapter 7.
+Example of Fraud Detection use case described in Chapter 10.
