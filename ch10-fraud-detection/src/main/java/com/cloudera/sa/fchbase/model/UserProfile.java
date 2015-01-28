@@ -25,6 +25,10 @@ public class UserProfile implements Cloneable{
     this.lastUpdatedTimeStamp = lastUpdatedTimeStamp;
   }
 
+  public UserProfile(String string) throws JSONException {
+      this(new JSONObject(string));
+  }
+
   public UserProfile(JSONObject jsonObject)  throws JSONException {
     userId = jsonObject.getString("userId");
     historicAvgSingleDaySpend = jsonObject.getDouble("historicAvgSingleDaySpend");
