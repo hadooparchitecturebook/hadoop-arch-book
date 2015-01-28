@@ -1,10 +1,9 @@
-package com.cloudera.sa.fchbase.model;
+package com.hadooparchitecturebook.frauddetection.model;
 
 import org.apache.hadoop.hbase.util.Bytes;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.mortbay.util.ajax.JSON;
 
 import java.util.HashMap;
 import java.util.HashSet;

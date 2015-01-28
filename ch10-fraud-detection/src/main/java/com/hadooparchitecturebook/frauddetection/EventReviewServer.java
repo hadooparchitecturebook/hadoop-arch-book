@@ -1,7 +1,7 @@
-package com.cloudera.sa.fchbase;
+package com.hadooparchitecturebook.frauddetection;
 
-import com.cloudera.sa.fchbase.model.Action;
-import com.cloudera.sa.fchbase.model.UserEvent;
+import com.hadooparchitecturebook.frauddetection.model.Action;
+import com.hadooparchitecturebook.frauddetection.model.UserEvent;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.codehaus.jettison.json.JSONException;
@@ -13,7 +13,6 @@ import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 
 import java.net.InetSocketAddress;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 
 

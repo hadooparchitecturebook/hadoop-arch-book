@@ -1,9 +1,9 @@
-package com.cloudera.sa.fchbase;
+package com.hadooparchitecturebook.frauddetection;
 
-import com.cloudera.sa.fchbase.Utils.HBaseUtils;
-import com.cloudera.sa.fchbase.Utils.UserProfileUtils;
-import com.cloudera.sa.fchbase.model.*;
-import com.cloudera.sa.fchbase.model.Action;
+import com.hadooparchitecturebook.frauddetection.Utils.HBaseUtils;
+import com.hadooparchitecturebook.frauddetection.Utils.UserProfileUtils;
+import com.hadooparchitecturebook.frauddetection.model.*;
+import com.hadooparchitecturebook.frauddetection.model.Action;
 import com.google.common.cache.*;
 import org.apache.flume.Event;
 import org.apache.flume.api.NettyAvroRpcClient;

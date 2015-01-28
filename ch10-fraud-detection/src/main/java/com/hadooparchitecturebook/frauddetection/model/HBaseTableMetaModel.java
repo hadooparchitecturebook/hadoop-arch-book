@@ -1,4 +1,4 @@
-package com.cloudera.sa.fchbase.model;
+package com.hadooparchitecturebook.frauddetection.model;
 
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.util.Bytes;

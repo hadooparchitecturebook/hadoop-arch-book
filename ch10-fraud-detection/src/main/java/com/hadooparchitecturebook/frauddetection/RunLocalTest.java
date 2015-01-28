@@ -1,9 +1,8 @@
-package com.cloudera.sa.fchbase;
+package com.hadooparchitecturebook.frauddetection;
 
-import com.cloudera.sa.fchbase.Utils.HBaseUtils;
-import com.cloudera.sa.fchbase.model.UserEvent;
-import com.cloudera.sa.fchbase.model.UserProfile;
-import com.cloudera.sa.fchbase.model.ValidationRules;
+import com.hadooparchitecturebook.frauddetection.Utils.HBaseUtils;
+import com.hadooparchitecturebook.frauddetection.model.UserProfile;
+import com.hadooparchitecturebook.frauddetection.model.ValidationRules;
 import org.apache.avro.AvroRemoteException;
 import org.apache.avro.ipc.NettyServer;
 import org.apache.avro.ipc.Responder;
@@ -13,18 +12,16 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseTestingUtility;
 import org.apache.hadoop.hbase.client.HConnection;
 import org.apache.hadoop.hbase.client.HConnectionManager;
-import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.avro.ipc.Server;
 import org.apache.flume.source.avro.AvroSourceProtocol;
 import org.apache.log4j.Logger;
-import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.Executors;
+
 import org.apache.flume.source.avro.Status;
 
 /**

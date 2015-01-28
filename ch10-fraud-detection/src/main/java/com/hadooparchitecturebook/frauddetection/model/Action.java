@@ -1,12 +1,7 @@
-package com.cloudera.sa.fchbase.model;
+package com.hadooparchitecturebook.frauddetection.model;
 
-import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 /**
  * Created by ted.malaska on 1/18/15.

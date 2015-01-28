@@ -1,6 +1,6 @@
-package com.cloudera.sa.fchbase;
+package com.hadooparchitecturebook.frauddetection;
 
-import com.cloudera.sa.fchbase.model.HBaseTableMetaModel;
+import com.hadooparchitecturebook.frauddetection.model.HBaseTableMetaModel;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.HBaseAdmin;

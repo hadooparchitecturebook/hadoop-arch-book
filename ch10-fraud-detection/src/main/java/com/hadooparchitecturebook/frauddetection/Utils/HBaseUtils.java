@@ -1,8 +1,8 @@
-package com.cloudera.sa.fchbase.Utils;
+package com.hadooparchitecturebook.frauddetection.Utils;
 
-import com.cloudera.sa.fchbase.model.HBaseTableMetaModel;
-import com.cloudera.sa.fchbase.model.UserProfile;
-import com.cloudera.sa.fchbase.model.ValidationRules;
+import com.hadooparchitecturebook.frauddetection.model.HBaseTableMetaModel;
+import com.hadooparchitecturebook.frauddetection.model.UserProfile;
+import com.hadooparchitecturebook.frauddetection.model.ValidationRules;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.HConnection;
 import org.apache.hadoop.hbase.client.HTableInterface;

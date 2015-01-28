@@ -1,11 +1,10 @@
-package com.cloudera.sa.fchbase.Utils;
+package com.hadooparchitecturebook.frauddetection.Utils;
 
-import com.cloudera.sa.fchbase.model.*;
+import com.hadooparchitecturebook.frauddetection.model.*;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.codehaus.jettison.json.JSONException;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.NavigableMap;
 

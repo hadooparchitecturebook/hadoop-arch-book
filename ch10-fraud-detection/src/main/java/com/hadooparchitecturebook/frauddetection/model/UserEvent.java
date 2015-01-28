@@ -1,4 +1,4 @@
-package com.cloudera.sa.fchbase.model;
+package com.hadooparchitecturebook.frauddetection.model;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
