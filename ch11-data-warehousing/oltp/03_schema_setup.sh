@@ -1,2 +1,2 @@
 #!/bin/bash
-psql -d oltp -U movielens -f create_tables.sql
+hive -f create_tables.sql
