@@ -1,2 +1,2 @@
 #!/bin/bash
-mysql -u root -f create_tables.sql
+mysql -u root < create_tables.sql
