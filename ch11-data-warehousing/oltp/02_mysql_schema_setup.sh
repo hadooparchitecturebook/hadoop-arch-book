@@ -1,2 +1,2 @@
 #!/bin/bash
-hive -f create_tables.sql
+mysql -u root -f create_tables.sql
