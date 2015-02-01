@@ -1,0 +1,2 @@
+Pre-requisites:
+Have a MySQL database with password less root access.
