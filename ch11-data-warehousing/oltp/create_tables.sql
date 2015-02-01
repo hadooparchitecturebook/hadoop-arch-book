@@ -1,3 +1,4 @@
+-- Tables for Hive/Hadoop
 -- users table
 -- zipcode is string instead of int, because we don't want zipcodes starting with 0 to be stripped of it.
 CREATE TABLE users(user_id INT PRIMARY KEY, age INT NOT NULL, gender CHAR(1) NOT NULL, occupation VARCHAR(64) NOT NULL, zipcode VARCHAR(5)  NOT NULL);
