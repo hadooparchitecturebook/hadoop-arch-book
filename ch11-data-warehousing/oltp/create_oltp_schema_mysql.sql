@@ -8,10 +8,10 @@ CREATE TABLE IF NOT EXISTS occupation (
 
 CREATE TABLE IF NOT EXISTS user(
   id INT PRIMARY KEY NOT NULL,
-  gender CHAR(1) NOT NULL,
-  zipcode VARCHAR(5) NOT NULL,
   age INT NOT NULL,
+  gender CHAR(1) NOT NULL,
   occupation_id INT NOT NULL,
+  zipcode VARCHAR(5) NOT NULL,
   last_modified DATETIME NOT NULL,
   FOREIGN KEY(occupation_id) REFERENCES occupation(id)
 );
