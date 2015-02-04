@@ -17,7 +17,7 @@ occupation_id = 0
 occupation_dict = dict()
 with open(os.path.join(os.path.expanduser('~'), 'ml-100k/u.occupation'), 'r') as occupation_file:
 	for occupation in [element.strip() for element in occupation_file]:
-		cur.execute("INSERT INTO occupation(id, name) VALUES (%s, %s)", (occupation_id, occupation))
+		cur.execute("INSERT INTO occupation(id, occupation) VALUES (%s, %s)", (occupation_id, occupation))
 		occupation_dict[occupation] = occupation_id
 		occupation_id += 1
 
