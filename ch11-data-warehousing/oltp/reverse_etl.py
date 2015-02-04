@@ -11,7 +11,7 @@ with open(os.path.join(os.path.expanduser('~'), 'ml-100k/u.genre'), 'r') as genr
 	genre_file = csv.reader(genre_csv, delimiter='|')
 	for row in genre_file:
 		if len(row) > 0:
-			cur.execute("INSERT INTO genre(id, name) VALUES (%s, %s)", (row[0], row[1]))
+			cur.execute("INSERT INTO genre(id, name) VALUES (%s, %s)", (row[1], row[0]))
 
 occupation_id = 0
 occupation_dict = dict()
