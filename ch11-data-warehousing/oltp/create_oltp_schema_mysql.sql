@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS genre(
 CREATE TABLE IF NOT EXISTS movie(
   id INT PRIMARY KEY NOT NULL,
   title VARCHAR(128) NOT NULL,
-  release_date DATE NOT,
+  release_date DATE,
   video_release_date DATE,
   imdb_url VARCHAR(1024) NOT NULL
 );
