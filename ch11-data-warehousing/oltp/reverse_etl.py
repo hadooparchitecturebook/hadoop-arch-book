@@ -29,7 +29,7 @@ with open(os.path.join(os.path.expanduser('~'), 'ml-100k/u.user'), 'r') as user_
 	for row in user_file:
 		occupation_id = occupation_dict[row[3]]
 		# throw exception if occupation_id is null
-		cur.execute("INSERT INTO user(id, age, gender, occupation_id, zipcode, last_modified) VALUES (%s, %s, %s, %s, %s, %s)", (row[0], row[1], row[2], occupation_id, row[4], last_updated))
+		cur.execute("INSERT INTO user(id, age, gender, occupation_id, zipcode, last_modified) VALUES (%s, %s, %s, %s, %s, %s)", (row[0], row[1], row[2], occupation_id, row[4], last_modified))
 
 
 
