@@ -2,6 +2,7 @@
 import os
 import csv
 import datetime
+import time
 import MySQLdb
 
 mydb = MySQLdb.connect(user="root", host="127.0.0.1", db="oltp")
@@ -32,7 +33,23 @@ with open(os.path.join(os.path.expanduser('~'), 'ml-100k/u.user'), 'r') as user_
 		cur.execute("INSERT INTO user(id, age, gender, occupation_id, zipcode, last_modified) VALUES (%s, %s, %s, %s, %s, %s)", (row[0], row[1], row[2], occupation_id, row[4], last_modified))
 
 
+with open(os.path.join(os.path.expanduser('~'), 'ml-100k/u.item'), 'r') as movie_csv:
+	movie_file = csv.reader(movie_csv, delimiter='|')
+	for row in movie_file:
+		release_date = time.strftime('%Y-%m-%d', time.strptime(row[2], "%d-%b-%Y"))
+		video_release_date = None
+		if row[3]:
+			video_release_date = time.strftime('%Y-%m-%d', time.strptime(row[3], "%d-%b-%Y"))
+		cur.execute("INSERT INTO movie(id, title, release_date, video_release_date, imdb_url) VALUES (%s, %s, %s, %s, %s)", (row[0], row[1], release_date, video_release_date, row[4]))
+		insert_statement = ''
+		for x in xrange(5, 24):
+			if row[x] == 1:
+				if insert_statement:
+					insert_statement += ","
+				# (movie_id,
+				insert_statement += "(%s," % row[x]
+				# genre_id)
+				insert_statement += str(x-5) + ")"
 
-#cur.execute("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='movielens' AND TABLE_NAME='movies'");
-
-#resultset = cur.fetchall()
+		if insert_statement:
+			cur.execute("INSERT INTO movie_genre (movie_id, genre_id) VALUES %s", (insert_statement))
