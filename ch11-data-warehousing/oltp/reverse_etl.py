@@ -57,5 +57,10 @@ with closing(mydb.cursor()) as cur:
 			if insert_statement:
 				cur.execute("INSERT INTO movie_genre(movie_id, genre_id) VALUES {}".format(insert_statement))
 
+	with open(os.path.join(os.path.expanduser('~'), 'ml-100k/u.data'), 'r') as rating_csv:
+		rating_file = csv.reader(rating_csv, delimiter='\t')
+		for row in rating_file:
+			cur.execute("INSERT INTO user_rating(timestamp, user_id, movie_id, rating) VALUES (FROM_UNIXTIME({}), {}, {}, {})".format(row[3], row[0], row[1], row[2]))
+
 mydb.commit()
 mydb.close()
