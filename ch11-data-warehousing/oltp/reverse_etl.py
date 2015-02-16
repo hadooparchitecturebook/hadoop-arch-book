@@ -15,7 +15,6 @@ with closing(mydb.cursor()) as cur:
 		genre_file = csv.reader(genre_csv, delimiter='|')
 		for row in genre_file:
 			if len(row) > 0:
-				print "INSERT INTO genre(id, name) VALUES ({}, '{}');".format(row[1], row[0])
 				cur.execute("INSERT INTO genre(id, name) VALUES (%s, %s)", (row[1], row[0]))
 
 	occupation_id = 0
@@ -45,10 +44,10 @@ with closing(mydb.cursor()) as cur:
 			video_release_date = None
 			if row[3]:
 				video_release_date = time.strftime('%Y-%m-%d', time.strptime(row[3], "%d-%b-%Y"))
-			#cur.execute("INSERT INTO movie(id, title, release_date, video_release_date, imdb_url) VALUES (%s, %s, %s, %s, %s)", (row[0], row[1], release_date, video_release_date, row[4]))
+			cur.execute("INSERT INTO movie(id, title, release_date, video_release_date, imdb_url) VALUES (%s, %s, %s, %s, %s)", (row[0], row[1], release_date, video_release_date, row[4]))
 			insert_statement = ''
 			for x in xrange(5, 24):
-				if row[x] == 1:
+				if row[x] == "1":
 					if insert_statement:
 						insert_statement += ","
 					# (movie_id,
@@ -56,7 +55,7 @@ with closing(mydb.cursor()) as cur:
 					# genre_id)
 					insert_statement += str(x-5) + ")"
 			if insert_statement:
-				print insert_statement
+				cur.execute("INSERT INTO movie_genre(movie_id, genre_id) VALUES {}".format(insert_statement))
 
 mydb.commit()
 mydb.close()
