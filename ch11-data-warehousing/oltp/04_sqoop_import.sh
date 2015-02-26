@@ -1,7 +1,7 @@
-#!/bin/bash
+#!/bin/bash -e
 # Run on -4
 # Need to copy Mysql connector jar to /var/lib/sqoop.
-See documentation http://www.cloudera.com/content/cloudera/en/documentation/core/v5-2-x/topics/cdh_ig_jdbc_driver_install.html
+# See documentation http://www.cloudera.com/content/cloudera/en/documentation/core/v5-2-x/topics/cdh_ig_jdbc_driver_install.html
 
 sudo -u hdfs hadoop fs -mkdir -p  /data/movielens
 sudo -u hdfs hadoop fs -chown -R $USER: /data/movielens
