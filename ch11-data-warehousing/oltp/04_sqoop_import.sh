@@ -11,8 +11,8 @@ sudo -u hdfs hadoop fs -chown -R $USER: /user/$USER
 
 # Need to have MySQL instance permissions set properly so all nodes of cluster (not just the node running sqoop command) can access the database
 
-# Cleanup if necessary
-sudo -u hdfs hadoop fs -rmr /data/movielens/movie
+# Cleanup if necessary. Script should continue even if this next rm command fails, hence the last || :
+sudo -u hdfs hadoop fs -rm -r /data/movielens/movie || :
 
 #Sqoop command is
 sqoop import --connect jdbc:mysql://mgrover-haa-2.vpc.cloudera.com:3306/oltp --username root --query 'SELECT movie.*, group_concat(genre.name) FROM movie JOIN movie_genre ON (movie.id = movie_genre.movie_id)
