@@ -6,7 +6,7 @@
 sudo -u hdfs hadoop fs -mkdir -p  /data/movielens
 sudo -u hdfs hadoop fs -chown -R $USER: /data/movielens
 
-sudo -u hdfs hadoop fs -mkdir /user/$USER
+sudo -u hdfs hadoop fs -mkdir -p /user/$USER
 sudo -u hdfs hadoop fs -chown -R $USER: /user/$USER
 
 # Need to have MySQL instance permissions set properly so all nodes of cluster (not just the node running sqoop command) can access the database
