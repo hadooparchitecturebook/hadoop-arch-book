@@ -51,7 +51,7 @@ with closing(mydb.cursor()) as cur:
 					if insert_statement:
 						insert_statement += ","
 					# (movie_id,
-					insert_statement += "(%s," % row[x]
+					insert_statement += "(%s," % row[0]
 					# genre_id)
 					insert_statement += str(x-5) + ")"
 			if insert_statement:
