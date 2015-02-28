@@ -13,14 +13,17 @@ sqoop job --create user_rating_import --meta-connect jdbc:hsqldb:hsql://${SQOOP_
 --table user_rating -m 8 --incremental append --check-column timestamp \
 --as-parquetfile --hive-import --warehouse-dir /etl/movielens/user_rating_fact --hive-table user_rating_fact
 
+# No need to create a table explictly.
+# Sqoop does that for ya.
+
 #Create user_rating_fact table in hive
-hive -e "CREATE EXTERNAL TABLE IF NOT EXISTS user_rating_fact(id INT, timestamp TIMESTAMP,
- user_id INT, movie_id INT, rating INT)
-ROW FORMAT SERDE 'parquet.hive.serde.ParquetHiveSerDe'
-STORED AS
-INPUTFORMAT 'parquet.hive.DeprecatedParquetInputFormat'
-OUTPUTFORMAT 'parquet.hive.DeprecatedParquetOutputFormat'
-LOCATION '/etl/movielens/user_rating_fact'"
+#hive -e "CREATE EXTERNAL TABLE IF NOT EXISTS user_rating_fact(id INT, timestamp TIMESTAMP,
+# user_id INT, movie_id INT, rating INT)
+#ROW FORMAT SERDE 'parquet.hive.serde.ParquetHiveSerDe'
+#STORED AS
+#INPUTFORMAT 'parquet.hive.DeprecatedParquetInputFormat'
+#OUTPUTFORMAT 'parquet.hive.DeprecatedParquetOutputFormat'
+#LOCATION '/etl/movielens/user_rating_fact'"
 
 sqoop job -exec user_rating_import --meta-connect jdbc:hsqldb:hsql://${SQOOP_METASTORE_HOST}:16000/sqoop
 
