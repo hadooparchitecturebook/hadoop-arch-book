@@ -4,7 +4,7 @@ CREATE TABLE user_movie_count AS
 SELECT
   movie_id,
   user_id,
-  COUNT(*)
+  COUNT(*) AS count
 FROM
   user_rating_fact
 GROUP BY
@@ -15,7 +15,7 @@ hive -e "
 CREATE TABLE avg_movie_rating AS
 SELECT
   movie_id,
-  ROUND(AVG(rating), 1)
+  ROUND(AVG(rating), 1) AS rating
 FROM
   user_rating_part
 GROUP BY
