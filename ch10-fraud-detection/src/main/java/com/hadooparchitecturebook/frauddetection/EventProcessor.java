@@ -178,6 +178,9 @@ public class EventProcessor {
 
           return UserProfileUtils.createUserProfile(familyMap);
         } else {
+
+            // If the UserProfile didn't exist, we create one and write it to HBase immediately
+            // Since it never existed, no need to checkAndPut
           UserProfile userProfile = new UserProfile();
           userProfile.userId = key;
 
@@ -229,6 +232,8 @@ public class EventProcessor {
     public void run() {
       while (isRunning) {
         List<Map.Entry<UserProfile, UserEvent>> userProfileList = new ArrayList<Map.Entry<UserProfile, UserEvent>>();
+
+          // We read a batch of profiles from an event queue
         try {
           for (int i = 0; i < MAX_BATCH_PUT_SIZE; i++) {
             Map.Entry<UserProfile, UserEvent> entry = pendingUserProfileUpdates.poll();
@@ -310,6 +315,7 @@ public class EventProcessor {
               }
 
             } else {
+
               List<Put> putList = new ArrayList<Put>();
 
               for (Map.Entry<UserProfile, UserEvent> entry: userProfileList) {
