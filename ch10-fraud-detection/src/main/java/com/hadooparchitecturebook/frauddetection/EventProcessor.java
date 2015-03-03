@@ -25,7 +25,7 @@ public class EventProcessor {
   public static final int HBASE_PULL_FLUSH_WAIT_TIME = 5;
 
 
-  static Logger log = Logger.getLogger(EventProcessor.class);
+  static Logger LOG = Logger.getLogger(EventProcessor.class);
 
   //Models
   static LoadingCache<String, UserProfile> profileLocalCache;
@@ -44,36 +44,38 @@ public class EventProcessor {
 
   static boolean isRunning;
 
-  static List<String> flumeHostPortList;
+  static List<String> flumeHostPortList = new ArrayList<String>();
   static boolean doCheckPutOnUserProfiles;
 
   private EventProcessor() {
 
   }
 
-  public static synchronized EventProcessor initAndStartEventProcess(Configuration hbaseConfig, List<String> flumeHosts, boolean doCheckPutOnUserProfiles) throws IOException {
+  public static synchronized EventProcessor initAndStartEventProcess(Configuration hbaseConfig, List<String> flumeList, boolean doCheckPutOnUserProfiles) throws IOException {
     if (eventProcessor == null) {
       eventProcessor = new EventProcessor();
 
-      log.info("Init caching object");
+      LOG.info("Init caching object");
       eventProcessor.profileLocalCache =
               CacheBuilder.newBuilder().maximumSize(10000).initialCapacity(1000).removalListener(new RemovalListener<String, UserProfile>() {
                 @Override
                 public void onRemoval(RemovalNotification<String, UserProfile> notification) {
-                  log.info("LoadingCache Removing: key " + notification.getKey());
+                  LOG.info("LoadingCache Removing: key " + notification.getKey());
                 }
               }).build(new CacheLoader<String, UserProfile>() {
                 public UserProfile load(String key) { // no checked exception
-                  log.info("LoadingCache load: key " + key);
+                  LOG.info("LoadingCache load: key " + key);
                   return eventProcessor.loadProfileFromHBase(key);
                 }
               });
 
-      log.info("Init HBase Connection");
+      LOG.info("Init HBase Connection");
       //Configuration config = HBaseConfiguration.create();
       hConnection = HConnectionManager.createConnection(hbaseConfig);
 
       scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(5);
+
+      ValidationRuleFetcher.updateValidationRules();
 
       scheduledThreadPoolExecutor.scheduleAtFixedRate(new ValidationRuleFetcher(), 5l, 5l, TimeUnit.MINUTES);
 
@@ -86,13 +88,19 @@ public class EventProcessor {
       }
 
 
+      flumeHostPortList.addAll(flumeList);
+
       isRunning = true;
+
+
 
       Thread hbaseFlusher = new Thread(new HBaseFlusher());
       hbaseFlusher.start();
 
       Thread flumeFluster = new Thread(new FlumeFlusher());
       flumeFluster.start();
+
+
 
     }
     return eventProcessor;
@@ -118,7 +126,11 @@ public class EventProcessor {
       public Boolean call() throws Exception {
         pendingUserProfileUpdates.put(new AbstractMap.SimpleEntry<UserProfile, UserEvent>(userProfile, userEvent));
 
-        userProfile.wait();
+        LOG.info("EventProcessor: pushed to HBase buffer:" + action.alert);
+        synchronized (userProfile) {
+          userProfile.wait();
+        }
+        LOG.info("EventProcessor: pushed to HBase:" + action.alert);
         return true;
       }
     });
@@ -126,8 +138,13 @@ public class EventProcessor {
     Future<Boolean> futureFlume = executorService.submit(new Callable<Boolean>() {
       @Override
       public Boolean call() throws Exception {
+        LOG.info("EventProcessor: push to flume:" + action.alert);
         pendingFlumeSubmits.put(action);
-        action.wait();
+        LOG.info("EventProcessor: pushed to flume buffer:" + action.alert);
+        synchronized (action) {
+          action.wait();
+        }
+        LOG.info("EventProcessor: pushed to flume:" + action.alert);
         return true;
       }
     });
@@ -139,10 +156,12 @@ public class EventProcessor {
   }
 
   public UserProfile loadProfileFromHBase(String key) {
-    log.info("Getting " + key + " from HBase with rowkey{" + key + "}");
+    LOG.info("Getting " + key + " from HBase with rowkey{" + key + "}");
 
     try {
       byte[] rowKey = HBaseUtils.convertKeyToRowKey(HBaseTableMetaModel.profileCacheTableName, key);
+
+      LOG.info("Getting " + key + " from HBase with rowkey{" + Bytes.toString(rowKey) + "}");
 
       Get get = new Get(rowKey);
 
@@ -154,6 +173,8 @@ public class EventProcessor {
         if (result != null) {
           NavigableMap<byte[], byte[]> familyMap = result
                   .getFamilyMap(HBaseTableMetaModel.profileCacheColumnFamily);
+
+
 
           return UserProfileUtils.createUserProfile(familyMap);
         } else {
@@ -172,15 +193,18 @@ public class EventProcessor {
         table.close();
       }
     } catch (Exception e) {
-      throw new RuntimeException("Unable to get record from HBase:" + key);
+      throw new RuntimeException("Unable to get record from HBase:" + key, e);
     }
   }
 
   public static class ValidationRuleFetcher implements Runnable {
     @Override
     public void run() {
+      updateValidationRules();
+    }
 
-      log.info("Updating validationRules");
+    public static void updateValidationRules() {
+      LOG.info("Updating validationRules");
       try {
         Get get = new Get(HBaseTableMetaModel.validationRulesRowKey);
 
@@ -191,9 +215,11 @@ public class EventProcessor {
 
         table.close();
 
+        LOG.info("loading validations");
         validationRules = ValidationRules.Builder.buildValidationRules(familyMap);
       } catch (Exception e) {
-        log.error(e);
+        LOG.error(e);
+        throw new RuntimeException("Unable to create validation rules: ", e);
       }
     }
   }
@@ -205,7 +231,7 @@ public class EventProcessor {
         List<Map.Entry<UserProfile, UserEvent>> userProfileList = new ArrayList<Map.Entry<UserProfile, UserEvent>>();
         try {
           for (int i = 0; i < MAX_BATCH_PUT_SIZE; i++) {
-            Map.Entry<UserProfile, UserEvent> entry = pendingUserProfileUpdates.remove();
+            Map.Entry<UserProfile, UserEvent> entry = pendingUserProfileUpdates.poll();
             if (entry == null) {
               break;
             }
@@ -307,21 +333,24 @@ public class EventProcessor {
           }
         } catch (Throwable t) {
           try {
-            log.error("Problem in HBaseFlusher", t);
+            LOG.error("Problem in HBaseFlusher", t);
             pendingUserProfileUpdates.addAll(userProfileList);
           } catch (Throwable t2) {
-            log.error("Problem in HBaseFlusher when trying to return puts to queue", t2);
+            LOG.error("Problem in HBaseFlusher when trying to return puts to queue", t2);
           }
         } finally {
           for (Map.Entry<UserProfile, UserEvent> entry: userProfileList) {
-            entry.getKey().notify();
+            UserProfile userProfile = entry.getKey();
+            synchronized (userProfile) {
+              userProfile.notify();
+            }
           }
         }
       }
       try {
         Thread.sleep(HBASE_PULL_FLUSH_WAIT_TIME);
       } catch (InterruptedException e) {
-        log.error("Problem in HBaseFlusher", e);
+        LOG.error("Problem in HBaseFlusher", e);
       }
     }
   }
@@ -342,47 +371,60 @@ public class EventProcessor {
         List<Action> actionList = new ArrayList<Action>();
         try {
           for (int i = 0; i < MAX_BATCH_PUT_SIZE; i++) {
-            Action action = pendingFlumeSubmits.remove();
+            Action action = pendingFlumeSubmits.poll();
             if (action == null) {
               break;
             }
             Event event = new SimpleEvent();
             event.setBody(Bytes.toBytes(action.getJSONObject().toString()));
             eventActionList.add(event);
+            actionList.add(action);
           }
           if (eventActionList.size() > 0) {
             client.appendBatch(eventActionList);
           }
         } catch (Throwable t) {
           try {
-            log.error("Problem in HBaseFlusher", t);
+            LOG.error("Problem in HBaseFlusher", t);
             pendingFlumeSubmits.addAll(actionList);
+            actionList.clear();
             client = null;
           } catch (Throwable t2) {
-            log.error("Problem in HBaseFlusher when trying to return puts to queue", t2);
+            LOG.error("Problem in HBaseFlusher when trying to return puts to queue", t2);
           }
         } finally {
           for (Action action: actionList) {
-            action.notify();
+            synchronized (action) {
+              action.notify();
+            }
           }
         }
       }
       try {
         Thread.sleep(HBASE_PULL_FLUSH_WAIT_TIME);
       } catch (InterruptedException e) {
-        log.error("Problem in HBaseFlusher", e);
+        LOG.error("Problem in HBaseFlusher", e);
       }
     }
 
     private NettyAvroRpcClient getClient() {
       Properties starterProp = new Properties();
       starterProp.setProperty(RpcClientConfigurationConstants.CONFIG_HOSTS, "h1");
-      starterProp.setProperty(RpcClientConfigurationConstants.CONFIG_HOSTS_PREFIX + "h1",  flumeHostPortList.get(flumeHost));
+
+      String hostPort = flumeHostPortList.get(flumeHost);
+
+      starterProp.setProperty(RpcClientConfigurationConstants.CONFIG_HOSTS_PREFIX + "h1",  hostPort);
 
       flumeHost++;
       if (flumeHost == flumeHostPortList.size()) { flumeHost = 0; }
 
-      return (NettyAvroRpcClient) RpcClientFactory.getInstance(starterProp);
+      LOG.info("EventProcessor: Trying to connect to " + hostPort);
+
+      NettyAvroRpcClient client = (NettyAvroRpcClient) RpcClientFactory.getInstance(starterProp);
+
+      LOG.info("EventProcessor: Connected to " + hostPort);
+
+      return client;
     }
   }
 }

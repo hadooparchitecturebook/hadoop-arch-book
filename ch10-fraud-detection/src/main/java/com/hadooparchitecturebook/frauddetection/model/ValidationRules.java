@@ -1,6 +1,7 @@
 package com.hadooparchitecturebook.frauddetection.model;
 
 import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -15,13 +16,27 @@ import java.util.NavigableMap;
  */
 public class ValidationRules {
 
-  public HashSet<String> bannedVanderIdSet;
-  public Double thresholdInSpendDifferenceFromTodayFromPastMonthAverage;
+  static Logger LOG = Logger.getLogger(ValidationRules.class);
+
+  public HashSet<String> bannedVanderIdSet = new HashSet<String>();
+  public Double thresholdInSpendDifferenceFromTodayFromPastMonthAverage = -1.0;
 
   public static class Builder {
     public static ValidationRules buildValidationRules(NavigableMap<byte[], byte[]> familyMap) throws Exception {
-      return new ValidationRules(Bytes.toString(familyMap.get(HBaseTableMetaModel.validationRulesRowKey)));
+
+      if (familyMap != null) {
+        byte[] bytes = familyMap.get(HBaseTableMetaModel.validationRulesRowKey);
+
+        return new ValidationRules(Bytes.toString(bytes));
+      } else {
+        LOG.warn("No Validation Rules Found in HBase");
+        return new ValidationRules();
+      }
     }
+  }
+
+  public ValidationRules() {
+
   }
 
   public ValidationRules(HashSet<String> bannedVanderIdSet, Double thresholdInSpendDifferenceFromTodayFromPastMonthAverage) {
@@ -35,14 +50,19 @@ public class ValidationRules {
 
 
   public ValidationRules(JSONObject jsonObject)  throws JSONException {
-    JSONArray jsonArray = jsonObject.getJSONArray("bannedVanderIds");
+    if (jsonObject != null) {
+      JSONArray jsonArray = jsonObject.getJSONArray("bannedVanderIds");
 
-    for (int i = 0; i < jsonArray.length(); i++) {
-      bannedVanderIdSet.add(jsonArray.getString(i));
+      for (int i = 0; i < jsonArray.length(); i++) {
+        String bannedId = jsonArray.getString(i);
+        LOG.info(" - Adding bannded venderId:" + bannedId);
+        bannedVanderIdSet.add(bannedId);
+      }
+
+      thresholdInSpendDifferenceFromTodayFromPastMonthAverage = jsonObject.getDouble("thresholdInSpendDifferenceFromTodayFromPastMonthAverage");
+    } else {
+      LOG.warn("No Validation Rules Found in HBase");
     }
-
-    thresholdInSpendDifferenceFromTodayFromPastMonthAverage = jsonObject.getDouble("thresholdInSpendDifferenceFromTodayFromPastMonthAverage");
-
   }
 
   private void populateMapWithLong(JSONObject jsonObject, HashMap<String, Long> hashMap) throws JSONException {

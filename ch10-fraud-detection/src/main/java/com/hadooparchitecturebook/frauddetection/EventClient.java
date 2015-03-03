@@ -10,17 +10,20 @@ import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.*;
 import org.jboss.netty.channel.group.ChannelGroup;
+import org.jboss.netty.channel.group.DefaultChannelGroup;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 
 /**
- * Created by ted.malaska on 1/18/15.
+ * This class emulates the end-point of our Fraud Detection system.
+ * This is where events come from. For example, this can represent the machine where users swipe credit-cards
+ * Or a mobile app for payment processing
  */
 public class EventClient {
 
-  Logger log = Logger.getLogger(EventClient.class);
+  Logger LOG = Logger.getLogger(EventClient.class);
 
   String host;
   int port;
@@ -44,6 +47,8 @@ public class EventClient {
         public ChannelPipeline getPipeline() {
           ChannelPipeline p = Channels.pipeline();
 
+          handler = new NettyClientHandler();
+
           p.addLast("handler", handler);
           return p;
         }
@@ -54,16 +59,19 @@ public class EventClient {
       bootstrap.setOption("sendBufferSize", 1048576);
 
       // Start the connection attempt.
+
+      LOG.info("EventClient: Connecting " + host + "," + port);
       ChannelFuture future = bootstrap.connect(new InetSocketAddress(host, port));
+      LOG.info("EventClient: Connected " + host + "," + port);
+
+      allChannels = new DefaultChannelGroup();
 
       // Wait until the connection is closed or the connection attempt fails.
       allChannels.add(future.getChannel());
+      LOG.info("EventClient: Added to Channels ");
 
     } catch (Exception e) {
       e.printStackTrace();
-    } finally {
-      // Shut down thread pools to exit.
-      bootstrap.releaseExternalResources();
     }
   }
 
@@ -78,7 +86,7 @@ public class EventClient {
   public class NettyClientHandler extends SimpleChannelUpstreamHandler {
 
     private final byte[] content;
-    ChannelStateEvent e;
+    ChannelStateEvent channelStateEvent;
 
     Action action;
 
@@ -93,19 +101,23 @@ public class EventClient {
         if (((ChannelStateEvent) e).getState() != ChannelState.INTEREST_OPS) {
           System.err.println(e);
         }
+        this.channelStateEvent = (ChannelStateEvent)e;
       }
+
       // Let SimpleChannelHandler call actual event handler methods below.
       super.handleUpstream(ctx, e);
     }
 
     @Override
     public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) {
-      this.e = e;
+
+      this.channelStateEvent = e;
     }
 
     @Override
     public void channelInterestChanged(ChannelHandlerContext ctx, ChannelStateEvent e) {
-      this.e = e;
+
+      this.channelStateEvent = e;
     }
 
     @Override
@@ -113,16 +125,19 @@ public class EventClient {
       // Server is supposed to send nothing.  Therefore, do nothing.
 
       try {
-        String actionStr = e.getMessage().toString();
+        String actionStr = Bytes.toString(((ChannelBuffer) e.getMessage()).array());
+        LOG.info("EventClient:ActionReplied:" + actionStr);
         action = new Action(actionStr);
-        log.info("ActionReplied:" + actionStr);
-        action.notify();
-      } catch (JSONException e1) {
-        log.error(e1);
-      }
-      action = null;
-      action.notify();
 
+        /* This is where a real end-point system would show the user whether the transaction was authorized or denied */
+        LOG.info("Was transaction accepted? " + action.accept);
+      } catch (JSONException e1) {
+        LOG.error(e1);
+        throw new RuntimeException("Unable to parse Action JSON", e1);
+      }
+      synchronized (this) {
+        this.notify();
+      }
     }
 
     @Override
@@ -131,25 +146,34 @@ public class EventClient {
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
+    public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent ex) {
       // Close the connection when an exception is raised.
-      e.getCause().printStackTrace();
-      e.getChannel().close();
+      ex.getCause().printStackTrace();
+      ex.getChannel().close();
     }
 
-    public synchronized Action submitUserEvent(UserEvent userEvent) throws Exception {
-      Channel channel = e.getChannel();
+    public Action submitUserEvent(UserEvent userEvent) throws Exception {
+      Channel channel = channelStateEvent.getChannel();
 
       if (channel.isWritable()) {
-        ChannelBuffer m = ChannelBuffers.wrappedBuffer(Bytes.toBytes(userEvent.getJSONObject().toString()));
+        String json = userEvent.getJSONObject().toString();
+        ChannelBuffer m = ChannelBuffers.wrappedBuffer(Bytes.toBytes(json));
+
+        LOG.info("EventClient:sending " + json);
+
         channel.write(m);
       } else {
-        throw new RuntimeException("WTF");
+        throw new RuntimeException("Channel is not writable");
       }
 
-      synchronized (action) {
-        action.wait();
+      synchronized (this) {
+        long startTime = System.currentTimeMillis();
+        LOG.info("-- EventClient:Waiting for response " + startTime);
+        this.wait();
+        LOG.info("-- EventClient:Got response " + (System.currentTimeMillis() - startTime));
       }
+
+      LOG.info("EventClient:action " + action.alert);
       return action;
     }
 

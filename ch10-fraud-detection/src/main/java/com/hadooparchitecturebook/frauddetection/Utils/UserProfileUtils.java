@@ -2,6 +2,7 @@ package com.hadooparchitecturebook.frauddetection.Utils;
 
 import com.hadooparchitecturebook.frauddetection.model.*;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONException;
 
 import java.util.ArrayList;
@@ -13,15 +14,16 @@ import java.util.NavigableMap;
  */
 public class UserProfileUtils {
 
-
+  public static Logger LOG = Logger.getLogger(UserProfileUtils.class);
 
   public static UserProfile createUserProfile(NavigableMap<byte[], byte[]> familyMap) throws JSONException {
 
     long timeStamp = Bytes.toLong(familyMap.get(HBaseTableMetaModel.profileCacheTsColumn));
 
+    String jsonString = Bytes.toString(familyMap.get(HBaseTableMetaModel.profileCacheJsonColumn));
+    LOG.info("createUserProfile: " + jsonString);
 
-    UserProfile userProfile = new UserProfile(
-            Bytes.toString(familyMap.get(HBaseTableMetaModel.profileCacheJsonColumn)), timeStamp);
+    UserProfile userProfile = new UserProfile(jsonString, timeStamp);
 
     return userProfile;
   }

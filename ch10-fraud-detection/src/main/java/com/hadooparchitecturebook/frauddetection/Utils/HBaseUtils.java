@@ -40,6 +40,7 @@ public class HBaseUtils {
     try {
       Put put = new Put(convertKeyToRowKey(HBaseTableMetaModel.profileCacheTableName, userProfile.userId));
       put.add(HBaseTableMetaModel.profileCacheColumnFamily, HBaseTableMetaModel.profileCacheJsonColumn, Bytes.toBytes(userProfile.getJSONObject().toString()));
+      put.add(HBaseTableMetaModel.profileCacheColumnFamily, HBaseTableMetaModel.profileCacheTsColumn, Bytes.toBytes(System.currentTimeMillis()));
       table.put(put);
     } finally {
       table.close();

@@ -25,7 +25,7 @@ public class Action {
 
   public Action(JSONObject jsonObject)  throws JSONException {
     userEvent = new UserEvent(jsonObject.getString("userEvent"));
-    userProfile = new UserProfile(jsonObject.getString("userProfile"));
+    userProfile = new UserProfile(jsonObject.getJSONObject("userProfile"));
     accept = jsonObject.getBoolean("accept");
     alert = jsonObject.getString("alert");
   }

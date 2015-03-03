@@ -4,6 +4,7 @@ import com.hadooparchitecturebook.frauddetection.model.Action;
 import com.hadooparchitecturebook.frauddetection.model.UserEvent;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONException;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.buffer.ChannelBuffer;
@@ -21,6 +22,8 @@ import java.util.concurrent.Executors;
  * Created by ted.malaska on 1/18/15.
  */
 public class EventReviewServer {
+
+  static Logger LOG = Logger.getLogger(EventReviewServer.class);
 
   static EventServerHandler handler;
   static Channel channel;
@@ -60,7 +63,11 @@ public class EventReviewServer {
         return p;
       }
     });
+
+    LOG.info("EventReviewServer: binding to :" + portNumber);
     channel = bootstrap.bind(new InetSocketAddress(portNumber));
+
+    LOG.info("EventReviewServer: bound to :" + portNumber + " " + channel.isBound() + " " + channel.getLocalAddress());
 
 
   }
@@ -95,13 +102,17 @@ public class EventReviewServer {
       // Discard received data silently by doing nothing.
       //String[] events = ((ChannelBuffer) e.getMessage()).toString().split("\n");
 
-      String jsonString = ((ChannelBuffer) e.getMessage()).toString();
+      String jsonString = Bytes.toString(((ChannelBuffer) e.getMessage()).array());
 
       try {
+        LOG.info("EventReviewServer: Get Message: " + jsonString);
         UserEvent userEvent = new UserEvent(jsonString);
         Action action = eventProcessor.reviewUserEvent(userEvent);
 
-        e.getChannel().write(ChannelBuffers.wrappedBuffer(Bytes.toBytes(action.getJSONObject().toString())));
+
+        String json = action.getJSONObject().toString();
+        LOG.info("EventReviewServer: Got Action: " + json);
+        e.getChannel().write(ChannelBuffers.wrappedBuffer(Bytes.toBytes(json)));
 
       } catch (JSONException e1) {
         throw new RuntimeException("Unable to parse JSON:" + jsonString, e1);

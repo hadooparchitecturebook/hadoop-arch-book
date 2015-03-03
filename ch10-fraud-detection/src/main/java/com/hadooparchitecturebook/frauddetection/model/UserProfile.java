@@ -12,7 +12,7 @@ public class UserProfile implements Cloneable{
 
   public String userId;
   public Long lastUpdatedTimeStamp;
-  public HashMap<String, Long> spendByLast100VenderId;
+  public HashMap<String, Long> spendByLast100VenderId = new HashMap<String, Long>();
   public Double historicAvgSingleDaySpend;
   public Double historicAvg90PercentSingleDaySpend;
   public Double todayMaxSpend;
@@ -23,10 +23,6 @@ public class UserProfile implements Cloneable{
   public UserProfile(String string, Long lastUpdatedTimeStamp) throws JSONException {
     this(new JSONObject(string));
     this.lastUpdatedTimeStamp = lastUpdatedTimeStamp;
-  }
-
-  public UserProfile(String string) throws JSONException {
-      this(new JSONObject(string));
   }
 
   public UserProfile(JSONObject jsonObject)  throws JSONException {

@@ -18,9 +18,18 @@ public class UserEvent{
   public String vendorId;
   public boolean isCardPresent;
 
-  public UserEvent() {}
-
-
+  public UserEvent(String userId, Long timeStamp, String ipAddress, String countryCode, String zipCode,
+                   String itemCategory, Double paymentAmount, String vendorId, boolean isCardPresent) {
+    this.userId = userId;
+    this.timeStamp = timeStamp;
+    this.ipAddress = ipAddress;
+    this.countryCode = countryCode;
+    this.zipCode = zipCode;
+    this.itemCategory = itemCategory;
+    this.paymentAmount = paymentAmount;
+    this.vendorId = vendorId;
+    this.isCardPresent = isCardPresent;
+  }
 
   public UserEvent(String string) throws JSONException {
     this(new JSONObject(string));

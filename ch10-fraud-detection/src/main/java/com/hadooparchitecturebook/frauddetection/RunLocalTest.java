@@ -1,6 +1,7 @@
 package com.hadooparchitecturebook.frauddetection;
 
 import com.hadooparchitecturebook.frauddetection.Utils.HBaseUtils;
+import com.hadooparchitecturebook.frauddetection.model.UserEvent;
 import com.hadooparchitecturebook.frauddetection.model.UserProfile;
 import com.hadooparchitecturebook.frauddetection.model.ValidationRules;
 import org.apache.avro.AvroRemoteException;
@@ -29,7 +30,7 @@ import org.apache.flume.source.avro.Status;
  */
 public class RunLocalTest {
 
-  public static Logger log = Logger.getLogger(RunLocalTest.class);
+  public static Logger LOG = Logger.getLogger(RunLocalTest.class);
 
   public static void main(String[] args) throws Exception{
 
@@ -44,16 +45,17 @@ public class RunLocalTest {
 
     CreateTables.executeCreateTables(config);
 
-    List<String> flumePorts = new ArrayList<String>();
-    flumePorts.add("localhost:4243");
 
-    EventReviewServer server = new EventReviewServer(4242, config, flumePorts, false);
-
-    EventClient client = new EventClient("localhost", 4242);
 
     //Start up servers
-    server.startServer();
     Server flumeTestServer = startTestFlumeServer(4243);
+
+    List<String> flumePorts = new ArrayList<String>();
+    flumePorts.add("127.0.0.1:4243");
+    EventReviewServer server = new EventReviewServer(4242, config, flumePorts, false);
+    server.startServer();
+
+    EventClient client = new EventClient("127.0.0.1", 4242);
     client.startClient();
 
     HConnection connection = HConnectionManager.createConnection(config);
@@ -63,7 +65,11 @@ public class RunLocalTest {
     populateValidationRules(connection);
 
     //populate user events
-    //TODO send test userEvents
+    UserEvent userEvent = new UserEvent("101", System.currentTimeMillis(),
+            "127.0.0.1", "1", "55555",
+            "42", 100.0, "101", true);
+
+    client.submitUserEvent(userEvent);
 
     //shut down servers
     client.closeClient();
@@ -80,7 +86,6 @@ public class RunLocalTest {
     ValidationRules rules = new ValidationRules(banndedVandors, 2.0);
 
     HBaseUtils.populateValidationRules(connection, rules);
-
   }
 
   private static void populateUserProfileData(HConnection connection) throws Exception {
@@ -110,23 +115,21 @@ public class RunLocalTest {
     HBaseUtils.populateUserProfile(connection, up1);
   }
 
-
-
   public static Server startTestFlumeServer(int port) {
     Responder responder = new SpecificResponder(AvroSourceProtocol.class,
             new OKAvroHandler());
     Server server = new NettyServer(responder,
-              new InetSocketAddress("localhost", port));
+              new InetSocketAddress("127.0.0.1", port));
 
     server.start();
-    log.info("Server started on test flume server hostname: localhost, port: " + port);
+    LOG.info("Server started on test flume server hostname: localhost, port: " + port);
 
     try {
 
-      Thread.sleep(300L);
+      Thread.sleep(1000L);
 
     } catch (InterruptedException ex) {
-      log.error("Thread interrupted. Exception follows.", ex);
+      LOG.error("Thread interrupted. Exception follows.", ex);
       Thread.currentThread().interrupt();
     }
 
@@ -138,7 +141,7 @@ public class RunLocalTest {
       server.close();
       server.join();
     } catch (InterruptedException ex) {
-      log.error("Thread interrupted. Exception follows.", ex);
+      LOG.error("Thread interrupted. Exception follows.", ex);
       Thread.currentThread().interrupt();
     }
   }
@@ -147,14 +150,14 @@ public class RunLocalTest {
 
     @Override
     public Status append(AvroFlumeEvent event) throws AvroRemoteException {
-      log.info("OK: Received event from append(): " + new String(event.getBody().array(), Charset.forName("UTF8")));
+      LOG.info("OK: Received event from append(): " + new String(event.getBody().array(), Charset.forName("UTF8")));
       return Status.OK;
     }
 
     @Override
     public Status appendBatch(List<AvroFlumeEvent> events) throws
             AvroRemoteException {
-      log.info("OK: Received " + events.size() + " events from appendBatch()");
+      LOG.info("OK: Received " + events.size() + " events from appendBatch()");
       return Status.OK;
     }
 
