@@ -1,0 +1,87 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.hadooparchitecturebook</groupId>
+  <artifactId>examples.crunch</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>examples-crunch</name>
+  <url>http://maven.apache.org</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <!-- cdh5 versions -->
+    <cdh5.version>5.3.1</cdh5.version>
+    <cdh5.hive.version>0.13.1-cdh${cdh5.version}</cdh5.hive.version>
+    <cdh5.hadoop.version>2.5.0-cdh${cdh5.version}</cdh5.hadoop.version>
+    <cdh5.crunch.version>0.11.0-cdh${cdh5.version}</cdh5.crunch.version>
+  </properties>
+
+  <profiles>
+    <profile>
+      <id>cdh5</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <cdh.version>${cdh5.version}</cdh.version>
+        <cdh.hive.version>${cdh5.hive.version}</cdh.hive.version>
+        <cdh.hadoop.version>${cdh5.hadoop.version}</cdh.hadoop.version>
+        <cdh.crunch.version>${cdh5.crunch.version}</cdh.crunch.version>
+      </properties>
+    </profile>
+  </profiles>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-common</artifactId>
+      <version>${cdh.hadoop.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.crunch</groupId>
+      <artifactId>crunch-core</artifactId>
+      <version>${cdh.crunch.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-mapreduce-client-core</artifactId>
+      <version>${cdh.hadoop.version}</version>
+    </dependency>
+  </dependencies>
+
+  <repositories>
+    <repository>
+      <id>maven-hadoop</id>
+      <name>Hadoop Releases</name>
+      <url>https://repository.cloudera.com/content/repositories/releases/</url>
+    </repository>
+  </repositories>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>2.2</version>
+        <configuration>
+          <shadedArtifactAttached>false</shadedArtifactAttached>
+          <outputFile>target/CrunchCode.jar</outputFile>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
