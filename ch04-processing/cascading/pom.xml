@@ -2,7 +2,7 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.cloudera.sa</groupId>
+  <groupId>com.hadooparchitecturebook</groupId>
   <artifactId>examples.cascading</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
@@ -84,7 +84,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.hadooparchitecturesbook.cascading.JoinFilterExampleCascading</mainClass>
+                            <mainClass>com.hadooparchitecturebook.cascading.JoinFilterExampleCascading</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

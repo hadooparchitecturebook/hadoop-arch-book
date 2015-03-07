@@ -1,4 +1,4 @@
-package com.hadooparchitecturesbook.cascading;
+package com.hadooparchitecturebook.cascading;
 
 import java.util.Properties;
 
