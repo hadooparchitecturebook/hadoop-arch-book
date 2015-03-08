@@ -1,0 +1,186 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.hadooparchitecturebook</groupId>
+  <artifactId>examples.giraph</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>giraph.1.0.0.zombie.bite</name>
+  <url>http://maven.apache.org</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <!-- cdh5 versions -->
+    <cdh5.version>5.3.1</cdh5.version>
+    <cdh5.hadoop.version>2.5.0-cdh${cdh5.version}</cdh5.hadoop.version>
+    <giraph.version>1.1.0-hadoop2</giraph.version>
+  </properties>
+            
+  <profiles>
+    <profile>
+      <id>cdh5</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <cdh.version>${cdh5.version}</cdh.version>
+        <cdh.hadoop.version>${cdh5.hadoop.version}</cdh.hadoop.version>
+      </properties>
+    </profile>
+  </profiles>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-common</artifactId>
+      <version>${cdh.hadoop.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-mapreduce-client-core</artifactId>
+      <version>${cdh.hadoop.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.giraph</groupId>
+      <artifactId>giraph-core</artifactId>
+      <version>${giraph.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.giraph</groupId>
+      <artifactId>giraph-examples</artifactId>
+      <version>${giraph.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-buffer</artifactId>
+      <version>4.0.26.Final</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-handler</artifactId>
+      <version>4.0.26.Final</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jodah</groupId>
+      <artifactId>typetools</artifactId>
+      <version>0.2.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.facebook.nifty</groupId>
+      <artifactId>nifty-client</artifactId>
+      <version>0.14.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.yammer.metrics</groupId>
+      <artifactId>metrics-core</artifactId>
+      <version>2.2.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>20140107</version>
+    </dependency>
+
+    <dependency>
+    <groupId>it.unimi.dsi</groupId>
+    <artifactId>fastutil</artifactId>
+    <version>6.6.3</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.iharder</groupId>
+      <artifactId>base64</artifactId>
+      <version>2.3.8</version>
+    </dependency>
+
+  </dependencies>
+
+  <repositories>
+    <repository>
+      <id>maven-hadoop</id>
+      <name>Hadoop Releases</name>
+      <url>https://repository.cloudera.com/content/repositories/releases/</url>
+    </repository>
+    <repository>
+      <id>maven</id>
+      <name>Maven repository</name>
+      <url>http://repo1.maven.org/maven2</url>
+    </repository>
+  </repositories>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>2.2</version>
+        <configuration>
+          <shadedArtifactAttached>false</shadedArtifactAttached>
+          <outputFile>target/GiraphCode.jar</outputFile>
+          <artifactSet>
+            <includes>
+              <include>*:*</include>
+              <include>org.apache.giraph:giraph-core</include>
+              <include>org.apache.giraph:giraph-examples</include>
+            </includes>
+          </artifactSet>
+          <filters>
+            <filter>
+              <artifact>*:*</artifact>
+              <excludes>
+                <exclude>META-INF/*.SF</exclude>
+                <exclude>META-INF/*.DSA</exclude>
+                <exclude>META-INF/*.RSA</exclude>
+              </excludes>
+            </filter>
+          </filters>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <artifactSet>
+                <excludes>
+                  <exclude>org.apache.spark*</exclude>
+                  <exclude>org.apache.hadoop*</exclude>
+                  <exclude>org.spark*</exclude>
+                </excludes>
+              </artifactSet>
+
+              <transformers>
+                <transformer
+                        implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+                <transformer
+                        implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                  <resource>reference.conf</resource>
+                </transformer>
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
