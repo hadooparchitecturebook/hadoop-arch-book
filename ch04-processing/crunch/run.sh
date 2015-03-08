@@ -19,6 +19,6 @@ if [ ! -f $JARFILE ]; then
 fi
 
 # Execute
-hadoop jar $JARFILE com.hadooparchitecturebook.crunch.JoinFilterExampleCrunch foo bar cru_output 500 500 10 2>&1 | tee $OUTPUTDIR/script.out
+hadoop jar $JARFILE com.hadooparchitecturebook.crunch.joinfilter.JoinFilterExampleCrunch foo bar cru_output 500 500 10 2>&1 | tee $OUTPUTDIR/script.out
 hdfs dfs -cat cru_output/part* > $OUTPUTDIR/data.txt
 

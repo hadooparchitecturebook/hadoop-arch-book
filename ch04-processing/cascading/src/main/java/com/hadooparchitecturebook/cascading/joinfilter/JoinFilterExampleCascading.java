@@ -1,4 +1,4 @@
-package com.hadooparchitecturebook.cascading;
+package com.hadooparchitecturebook.cascading.joinfilter;
 
 import java.util.Properties;
 
