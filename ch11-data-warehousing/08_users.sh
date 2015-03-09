@@ -9,8 +9,8 @@ sudo -u hdfs hadoop fs -chown -R $USER: /etl/movielens/user_upserts
 
 sudo -u hdfs hadoop fs -rm -r /user/hive/warehouse/user_upserts || :
 
-sudo -u hdfs hadoop fs -mkdir -p /data/movielens/user
-sudo -u hdfs hadoop fs -chown -R $USER: /data/movielens/user
+sudo -u hdfs hadoop fs -mkdir -p /etl/movielens/user
+sudo -u hdfs hadoop fs -chown -R $USER: /etl/movielens/user
 
 hive -e \
 "CREATE EXTERNAL TABLE IF NOT EXISTS user_upserts(id INT, age INT, occupation STRING, zipcode STRING, last_modified BIGINT)
@@ -29,7 +29,7 @@ ROW FORMAT SERDE 'parquet.hive.serde.ParquetHiveSerDe'
 STORED AS
 INPUTFORMAT 'parquet.hive.DeprecatedParquetInputFormat'
 OUTPUTFORMAT 'parquet.hive.DeprecatedParquetOutputFormat'
-LOCATION '/data/movielens/user'"
+LOCATION '/etl/movielens/user'"
 
 sqoop job --delete user_upserts_import --meta-connect jdbc:hsqldb:hsql://${SQOOP_METASTORE_HOST}:16000/sqoop
 
