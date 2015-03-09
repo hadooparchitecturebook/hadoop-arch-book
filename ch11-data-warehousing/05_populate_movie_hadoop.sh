@@ -7,8 +7,8 @@ sudo -u hdfs hadoop fs -chown -R $USER: /metadata/movielens/movie
 # Clean up the destination schema file, if it exists. The last ||: ensures that we carry on the script even 
 # when the destination doesn't exist.
 sudo -u hdfs hadoop fs -rm /metadata/movielens/movie/movie.avsc || :
-hadoop jar ${AVRO_HOME}/avro-tools.jar getschema /data/movielens/movie/part-m-00000.avro \
-| hadoop fs -put - /metadata/movielens/movie/movie.avsc
+hadoop jar ${AVRO_HOME}/avro-tools.jar getschema /data/movielens/movie/part-m-00000.avro | \
+hadoop fs -put - /metadata/movielens/movie/movie.avsc
 
 hive -e "CREATE EXTERNAL TABLE IF NOT EXISTS movie
 ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.avro.AvroSerDe'
