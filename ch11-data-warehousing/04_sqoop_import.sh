@@ -9,7 +9,7 @@ sudo -u hdfs hadoop fs -chown -R $USER: /data/movielens
 sudo -u hdfs hadoop fs -mkdir -p /user/$USER
 sudo -u hdfs hadoop fs -chown -R $USER: /user/$USER
 
-# Need to have MySQL instance permissions set properly so all nodes of cluster (not just the node running sqoop command) can access the database
+# All nodes need to have access to the source database
 
 # Cleanup if necessary. Script should continue even if this next rm command fails, hence the last || :
 sudo -u hdfs hadoop fs -rm -r /data/movielens/movie || :
