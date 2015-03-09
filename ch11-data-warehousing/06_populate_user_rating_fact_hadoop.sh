@@ -10,7 +10,7 @@ sqoop job --delete user_rating_import --meta-connect jdbc:hsqldb:hsql://${SQOOP_
 
 # TODO: Made minor changes. Test this
 # Need to explictly export HIVE_HOME before this command if Hive is not present under /usr/lib/hive
-# No need to do this if you are using Apache Sqoop 1.4.6 or later
+# No need to do so if you are using Apache Sqoop 1.4.6 or later
 sqoop job --create user_rating_import --meta-connect jdbc:hsqldb:hsql://${SQOOP_METASTORE_HOST}:16000/sqoop \
 -- import --connect jdbc:mysql://mgrover-haa-2.vpc.cloudera.com:3306/oltp --username root \
 --table user_rating -m 8 --incremental lastmodified --check-column timestamp --append
