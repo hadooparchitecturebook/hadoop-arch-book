@@ -1,4 +1,4 @@
-package com.hadooparchitecturebook.scala.peaksandvalleys
+package com.hadooparchitecturebook.spark.peaksandvalleys
 
 import org.apache.hadoop.io.{Text, LongWritable}
 import org.apache.hadoop.mapred.TextInputFormat

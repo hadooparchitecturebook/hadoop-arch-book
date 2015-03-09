@@ -1,4 +1,4 @@
-package com.hadooparchitecturebook.scala.peaksandvalleys
+package com.hadooparchitecturebook.spark.peaksandvalleys
 
 import java.io.{OutputStreamWriter, BufferedWriter}
 import java.util.Random

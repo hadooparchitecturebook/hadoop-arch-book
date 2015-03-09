@@ -1,4 +1,4 @@
-package com.hadooparchitecturebook.scala.dedup
+package com.hadooparchitecturebook.spark.dedup
 
 import java.util.Random
 

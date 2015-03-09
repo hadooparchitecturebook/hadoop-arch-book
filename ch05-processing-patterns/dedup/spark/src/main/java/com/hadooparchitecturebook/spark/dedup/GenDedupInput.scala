@@ -1,4 +1,4 @@
-package com.hadooparchitecturebook.scala.dedup
+package com.hadooparchitecturebook.spark.dedup
 
 import java.io.{OutputStreamWriter, BufferedWriter}
 import java.util.Random

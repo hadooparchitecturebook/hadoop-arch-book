@@ -1,4 +1,4 @@
-package com.hadooparchitecturebook.scala.timeseries
+package com.hadooparchitecturebook.spark.timeseries
 
 import java.io.{OutputStreamWriter, BufferedWriter}
 import java.util.Random
