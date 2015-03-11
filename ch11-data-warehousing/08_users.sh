@@ -7,10 +7,15 @@ sudo -u hdfs hadoop fs -rm -r /etl/movielens/user_upserts || :
 sudo -u hdfs hadoop fs -mkdir -p /etl/movielens/user_upserts
 sudo -u hdfs hadoop fs -chown -R $USER: /etl/movielens/user_upserts
 
-sudo -u hdfs hadoop fs -rm -r /user/hive/warehouse/user_upserts || :
-
+sudo -u hdfs hadoop fs -rm -r /user/hive/warehouse/user || :
 sudo -u hdfs hadoop fs -mkdir -p /etl/movielens/user
 sudo -u hdfs hadoop fs -chown -R $USER: /etl/movielens/user
+
+DT=$(date "+%Y-%m-%d")
+
+sudo -u hdfs hadoop fs -rm -r /etl/movielens/user_${DT} || :
+sudo -u hdfs hadoop fs -mkdir -p /etl/movielens/user_${DT}
+sudo -u hdfs hadoop fs -chown -R $USER: /etl/movielens/user_${DT}
 
 hive -e \
 "CREATE EXTERNAL TABLE IF NOT EXISTS user_upserts(id INT, age INT, occupation STRING, zipcode STRING, last_modified BIGINT)
@@ -30,6 +35,14 @@ STORED AS
 INPUTFORMAT 'parquet.hive.DeprecatedParquetInputFormat'
 OUTPUTFORMAT 'parquet.hive.DeprecatedParquetOutputFormat'
 LOCATION '/etl/movielens/user'"
+
+hive -e \
+"CREATE EXTERNAL TABLE IF NOT EXISTS user_tmp(id INT, age INT, occupation STRING, zipcode STRING, last_modified TIMESTAMP)
+ROW FORMAT SERDE 'parquet.hive.serde.ParquetHiveSerDe'
+STORED AS
+INPUTFORMAT 'parquet.hive.DeprecatedParquetInputFormat'
+OUTPUTFORMAT 'parquet.hive.DeprecatedParquetOutputFormat'
+LOCATION '/etl/movielens/user_$DT'"
 
 sqoop job --delete user_upserts_import --meta-connect jdbc:hsqldb:hsql://${SQOOP_METASTORE_HOST}:16000/sqoop
 
@@ -61,8 +74,8 @@ INSERT OVERWRITE TABLE user
   FROM
     user_upserts"
 
-YEAR=$(date "+%y")
-MONTH=$(date "+%M")
+YEAR=$(date "+%Y")
+MONTH=$(date "+%m")
 DAY=$(date "+%d")
 
 sudo -u hdfs hadoop fs -mkdir -p /etl/movielens/user_history/year=${YEAR}/month=${MONTH}/day=${DAY}
