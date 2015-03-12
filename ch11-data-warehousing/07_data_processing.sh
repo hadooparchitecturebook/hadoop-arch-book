@@ -1,6 +1,6 @@
 #!/bin/bash
-sudo -u hdfs hadoop fs -mkdir -p  /etl/movielens/user_rating
-sudo -u hdfs hadoop fs -chown -R ${USER}: /etl/movielens/user_rating
+sudo -u hdfs hadoop fs -mkdir -p  /data/movielens/user_rating
+sudo -u hdfs hadoop fs -chown -R ${USER}: /data/movielens/user_rating
 # user_rating that compacts user_rating_fact to a single rating per user per movie
 # No need for id's here, since multiple user_rating_fact id's would potentially get squashed into 1
 # in this table, anyways.
@@ -10,7 +10,7 @@ ROW FORMAT SERDE 'parquet.hive.serde.ParquetHiveSerDe'
 STORED AS
 INPUTFORMAT 'parquet.hive.DeprecatedParquetInputFormat'
 OUTPUTFORMAT 'parquet.hive.DeprecatedParquetOutputFormat'
-LOCATION '/etl/movielens/user_rating'"
+LOCATION '/data/movielens/user_rating'"
 
 hive -e "
 INSERT INTO TABLE user_rating
@@ -26,8 +26,8 @@ GROUP BY
   movie_id"
 
 
-sudo -u hdfs hadoop fs -mkdir -p  /etl/movielens/user_rating_part
-sudo -u hdfs hadoop fs -chown -R ${USER}: /etl/movielens/user_rating_part
+sudo -u hdfs hadoop fs -mkdir -p  /data/movielens/user_rating_part
+sudo -u hdfs hadoop fs -chown -R ${USER}: /data/movielens/user_rating_part
 hive -e "CREATE EXTERNAL TABLE IF NOT EXISTS
 user_rating_part(user_id INT, movie_id INT, rating INT, last_modified TIMESTAMP)
 PARTITIONED BY (year INT, month INT, day INT)
@@ -35,7 +35,7 @@ ROW FORMAT SERDE 'parquet.hive.serde.ParquetHiveSerDe'
 STORED AS
 INPUTFORMAT 'parquet.hive.DeprecatedParquetInputFormat'
 OUTPUTFORMAT 'parquet.hive.DeprecatedParquetOutputFormat'
-LOCATION '/etl/movielens/user_rating_part'"
+LOCATION '/data/movielens/user_rating_part'"
 
 hive -e "
 SET hive.exec.dynamic.partition.mode=nonstrict;

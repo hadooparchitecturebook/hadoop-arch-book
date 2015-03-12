@@ -1,21 +1,21 @@
 #!/bin/bash
 SQOOP_METASTORE_HOST=localhost
-sudo -u hdfs hadoop fs -mkdir -p /etl/movielens/user_history
-sudo -u hdfs hadoop fs -chown -R ${USER}: /etl/movielens/user_history
+sudo -u hdfs hadoop fs -mkdir -p /data/movielens/user_history
+sudo -u hdfs hadoop fs -chown -R ${USER}: /data/movielens/user_history
 
 sudo -u hdfs hadoop fs -rm -r /etl/movielens/user_upserts || :
 sudo -u hdfs hadoop fs -mkdir -p /etl/movielens/user_upserts
 sudo -u hdfs hadoop fs -chown -R ${USER}: /etl/movielens/user_upserts
 
 sudo -u hdfs hadoop fs -rm -r /user/hive/warehouse/user || :
-sudo -u hdfs hadoop fs -mkdir -p /etl/movielens/user
-sudo -u hdfs hadoop fs -chown -R ${USER}: /etl/movielens/user
+sudo -u hdfs hadoop fs -mkdir -p /data/movielens/user
+sudo -u hdfs hadoop fs -chown -R ${USER}: /data/movielens/user
 
 DT=$(date "+%Y-%m-%d")
 
-sudo -u hdfs hadoop fs -rm -r /etl/movielens/user_${DT} || :
-sudo -u hdfs hadoop fs -mkdir -p /etl/movielens/user_${DT}
-sudo -u hdfs hadoop fs -chown -R ${USER}: /etl/movielens/user_${DT}
+sudo -u hdfs hadoop fs -rm -r /data/movielens/user_${DT} || :
+sudo -u hdfs hadoop fs -mkdir -p /data/movielens/user_${DT}
+sudo -u hdfs hadoop fs -chown -R ${USER}: /data/movielens/user_${DT}
 
 hive -e \
 "CREATE EXTERNAL TABLE IF NOT EXISTS user_upserts(id INT, age INT, occupation STRING, zipcode STRING, last_modified BIGINT)
@@ -26,7 +26,7 @@ hive -e \
 "CREATE EXTERNAL TABLE IF NOT EXISTS user_history(id INT, age INT, occupation STRING, zipcode STRING, last_modified BIGINT)
 PARTITIONED BY (year INT, month INT, day INT)
 STORED AS AVRO
-LOCATION '/etl/movielens/user_history'"
+LOCATION '/data/movielens/user_history'"
 
 hive -e \
 "CREATE EXTERNAL TABLE IF NOT EXISTS user(id INT, age INT, occupation STRING, zipcode STRING, last_modified TIMESTAMP)
@@ -34,7 +34,7 @@ ROW FORMAT SERDE 'parquet.hive.serde.ParquetHiveSerDe'
 STORED AS
 INPUTFORMAT 'parquet.hive.DeprecatedParquetInputFormat'
 OUTPUTFORMAT 'parquet.hive.DeprecatedParquetOutputFormat'
-LOCATION '/etl/movielens/user'"
+LOCATION '/data/movielens/user'"
 
 hive -e \
 "CREATE EXTERNAL TABLE IF NOT EXISTS user_tmp(id INT, age INT, occupation STRING, zipcode STRING, last_modified TIMESTAMP)
@@ -42,7 +42,7 @@ ROW FORMAT SERDE 'parquet.hive.serde.ParquetHiveSerDe'
 STORED AS
 INPUTFORMAT 'parquet.hive.DeprecatedParquetInputFormat'
 OUTPUTFORMAT 'parquet.hive.DeprecatedParquetOutputFormat'
-LOCATION '/etl/movielens/user_${DT}'"
+LOCATION '/data/movielens/user_${DT}'"
 
 sqoop job --delete user_upserts_import --meta-connect jdbc:hsqldb:hsql://${SQOOP_METASTORE_HOST}:16000/sqoop
 
@@ -53,7 +53,7 @@ sqoop job --create user_upserts_import --meta-connect jdbc:hsqldb:hsql://${SQOOP
 --query 'SELECT user.id, user.age, user.gender, 
 occupation.occupation, zipcode, last_modified FROM user JOIN occupation 
 ON (user.occupation_id = occupation.id) WHERE ${CONDITIONS}' \
---target-dir /etl/movielens/user_upserts
+--target-dir /data/movielens/user_upserts
 
 sqoop job -exec user_upserts_import --meta-connect jdbc:hsqldb:hsql://${SQOOP_METASTORE_HOST}:16000/sqoop
 
@@ -78,7 +78,7 @@ YEAR=$(date "+%Y")
 MONTH=$(date "+%m")
 DAY=$(date "+%d")
 
-sudo -u hdfs hadoop fs -mkdir -p /etl/movielens/user_history/year=${YEAR}/month=${MONTH}/day=${DAY}
-sudo -u hdfs hadoop fs -mv /etl/movielens/user_upserts/* /etl/movielens/user_history/year=${YEAR}/month=${MONTH}/day=${DAY}
+sudo -u hdfs hadoop fs -mkdir -p /data/movielens/user_history/year=${YEAR}/month=${MONTH}/day=${DAY}
+sudo -u hdfs hadoop fs -mv /data/movielens/user_upserts/* /data/movielens/user_history/year=${YEAR}/month=${MONTH}/day=${DAY}
 
 hive -e "ALTER TABLE user_history ADD PARTITION (year=${YEAR}, month=${MONTH}, day=${DAY})"
