@@ -53,7 +53,7 @@ sqoop job --create user_upserts_import --meta-connect jdbc:hsqldb:hsql://${SQOOP
 --query 'SELECT user.id, user.age, user.gender, 
 occupation.occupation, zipcode, last_modified FROM user JOIN occupation 
 ON (user.occupation_id = occupation.id) WHERE ${CONDITIONS}' \
---target-dir /data/movielens/user_upserts
+--target-dir /etl/movielens/user_upserts
 
 sqoop job -exec user_upserts_import --meta-connect jdbc:hsqldb:hsql://${SQOOP_METASTORE_HOST}:16000/sqoop
 
@@ -79,6 +79,6 @@ MONTH=$(date "+%m")
 DAY=$(date "+%d")
 
 sudo -u hdfs hadoop fs -mkdir -p /data/movielens/user_history/year=${YEAR}/month=${MONTH}/day=${DAY}
-sudo -u hdfs hadoop fs -mv /data/movielens/user_upserts/* /data/movielens/user_history/year=${YEAR}/month=${MONTH}/day=${DAY}
+sudo -u hdfs hadoop fs -mv /etl/movielens/user_upserts/* /data/movielens/user_history/year=${YEAR}/month=${MONTH}/day=${DAY}
 
 hive -e "ALTER TABLE user_history ADD PARTITION (year=${YEAR}, month=${MONTH}, day=${DAY})"
