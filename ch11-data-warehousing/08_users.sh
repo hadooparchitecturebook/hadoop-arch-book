@@ -1,21 +1,21 @@
 #!/bin/bash
 SQOOP_METASTORE_HOST=localhost
 sudo -u hdfs hadoop fs -mkdir -p /etl/movielens/user_history
-sudo -u hdfs hadoop fs -chown -R $USER: /etl/movielens/user_history
+sudo -u hdfs hadoop fs -chown -R ${USER}: /etl/movielens/user_history
 
 sudo -u hdfs hadoop fs -rm -r /etl/movielens/user_upserts || :
 sudo -u hdfs hadoop fs -mkdir -p /etl/movielens/user_upserts
-sudo -u hdfs hadoop fs -chown -R $USER: /etl/movielens/user_upserts
+sudo -u hdfs hadoop fs -chown -R ${USER}: /etl/movielens/user_upserts
 
 sudo -u hdfs hadoop fs -rm -r /user/hive/warehouse/user || :
 sudo -u hdfs hadoop fs -mkdir -p /etl/movielens/user
-sudo -u hdfs hadoop fs -chown -R $USER: /etl/movielens/user
+sudo -u hdfs hadoop fs -chown -R ${USER}: /etl/movielens/user
 
 DT=$(date "+%Y-%m-%d")
 
 sudo -u hdfs hadoop fs -rm -r /etl/movielens/user_${DT} || :
 sudo -u hdfs hadoop fs -mkdir -p /etl/movielens/user_${DT}
-sudo -u hdfs hadoop fs -chown -R $USER: /etl/movielens/user_${DT}
+sudo -u hdfs hadoop fs -chown -R ${USER}: /etl/movielens/user_${DT}
 
 hive -e \
 "CREATE EXTERNAL TABLE IF NOT EXISTS user_upserts(id INT, age INT, occupation STRING, zipcode STRING, last_modified BIGINT)
@@ -42,7 +42,7 @@ ROW FORMAT SERDE 'parquet.hive.serde.ParquetHiveSerDe'
 STORED AS
 INPUTFORMAT 'parquet.hive.DeprecatedParquetInputFormat'
 OUTPUTFORMAT 'parquet.hive.DeprecatedParquetOutputFormat'
-LOCATION '/etl/movielens/user_$DT'"
+LOCATION '/etl/movielens/user_${DT}'"
 
 sqoop job --delete user_upserts_import --meta-connect jdbc:hsqldb:hsql://${SQOOP_METASTORE_HOST}:16000/sqoop
 
@@ -52,13 +52,13 @@ sqoop job --create user_upserts_import --meta-connect jdbc:hsqldb:hsql://${SQOOP
 -m 8 --incremental append --check-column last_modified --split-by last_modified --as-avrodatafile \
 --query 'SELECT user.id, user.age, user.gender, 
 occupation.occupation, zipcode, last_modified FROM user JOIN occupation 
-ON (user.occupation_id = occupation.id) WHERE $CONDITIONS' \
+ON (user.occupation_id = occupation.id) WHERE ${CONDITIONS}' \
 --target-dir /etl/movielens/user_upserts
 
 sqoop job -exec user_upserts_import --meta-connect jdbc:hsqldb:hsql://${SQOOP_METASTORE_HOST}:16000/sqoop
 
 hive -e "
-INSERT OVERWRITE TABLE user
+INSERT OVERWRITE TABLE user_tmp
   SELECT
     user.*
   FROM

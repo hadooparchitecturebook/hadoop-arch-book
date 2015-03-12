@@ -2,7 +2,7 @@
 AVRO_HOME=/opt/cloudera/parcels/CDH/lib/avro
 
 sudo -u hdfs hadoop fs -mkdir -p /metadata/movielens/movie
-sudo -u hdfs hadoop fs -chown -R $USER: /metadata/movielens/movie
+sudo -u hdfs hadoop fs -chown -R ${USER}: /metadata/movielens/movie
 
 # Clean up the destination schema file, if it exists. The last ||: ensures that we carry on the script even 
 # when the destination doesn't exist.

@@ -2,7 +2,7 @@
 SQOOP_METASTORE_HOST=localhost
 
 sudo -u hdfs hadoop fs -mkdir -p  /etl/movielens/user_rating_fact
-sudo -u hdfs hadoop fs -chown -R $USER: /etl/movielens/user_rating_fact
+sudo -u hdfs hadoop fs -chown -R ${USER}: /etl/movielens/user_rating_fact
 
 # Delete the job if it already exists. If it doesn't exist, the last ||: ensures, the exit code is still
 # success and the script continues on.
