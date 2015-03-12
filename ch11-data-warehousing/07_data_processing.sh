@@ -12,6 +12,7 @@ INPUTFORMAT 'parquet.hive.DeprecatedParquetInputFormat'
 OUTPUTFORMAT 'parquet.hive.DeprecatedParquetOutputFormat'
 LOCATION '/data/movielens/user_rating'"
 
+#Pick the latest rating given by the user to each movie
 hive -e "
 INSERT INTO TABLE user_rating
 SELECT
