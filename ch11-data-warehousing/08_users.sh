@@ -18,18 +18,33 @@ sudo -u hdfs hadoop fs -mkdir -p /data/movielens/user_${DT}
 sudo -u hdfs hadoop fs -chown -R ${USER}: /data/movielens/user_${DT}
 
 hive -e \
-"CREATE EXTERNAL TABLE IF NOT EXISTS user_upserts(id INT, age INT, occupation STRING, zipcode STRING, last_modified BIGINT)
+"CREATE EXTERNAL TABLE IF NOT EXISTS user_upserts(
+  id INT,
+  age INT,
+  occupation STRING,
+  zipcode STRING,
+  last_modified BIGINT)
 STORED AS AVRO
 LOCATION '/etl/movielens/user_upserts'"
 
 hive -e \
-"CREATE EXTERNAL TABLE IF NOT EXISTS user_history(id INT, age INT, occupation STRING, zipcode STRING, last_modified BIGINT)
+"CREATE EXTERNAL TABLE IF NOT EXISTS user_history(
+  id INT,
+  age INT,
+  occupation STRING,
+  zipcode STRING,
+  last_modified BIGINT)
 PARTITIONED BY (year INT, month INT, day INT)
 STORED AS AVRO
 LOCATION '/data/movielens/user_history'"
 
 hive -e \
-"CREATE EXTERNAL TABLE IF NOT EXISTS user(id INT, age INT, occupation STRING, zipcode STRING, last_modified TIMESTAMP)
+"CREATE EXTERNAL TABLE IF NOT EXISTS user(
+  id INT,
+  age INT,
+  occupation STRING,
+  zipcode STRING,
+  last_modified TIMESTAMP)
 ROW FORMAT SERDE 'parquet.hive.serde.ParquetHiveSerDe'
 STORED AS
 INPUTFORMAT 'parquet.hive.DeprecatedParquetInputFormat'
@@ -37,7 +52,12 @@ OUTPUTFORMAT 'parquet.hive.DeprecatedParquetOutputFormat'
 LOCATION '/data/movielens/user'"
 
 hive -e \
-"CREATE EXTERNAL TABLE IF NOT EXISTS user_tmp(id INT, age INT, occupation STRING, zipcode STRING, last_modified TIMESTAMP)
+"CREATE EXTERNAL TABLE IF NOT EXISTS user_tmp(
+  id INT,
+  age INT,
+  occupation STRING,
+  zipcode STRING,
+  last_modified TIMESTAMP)
 ROW FORMAT SERDE 'parquet.hive.serde.ParquetHiveSerDe'
 STORED AS
 INPUTFORMAT 'parquet.hive.DeprecatedParquetInputFormat'

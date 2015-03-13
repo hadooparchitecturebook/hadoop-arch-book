@@ -20,8 +20,12 @@ sqoop job --create user_rating_import --meta-connect jdbc:hsqldb:hsql://${SQOOP_
 # Sqoop does that for ya.
 
 #Create user_rating_fact table in hive
-#hive -e "CREATE EXTERNAL TABLE IF NOT EXISTS user_rating_fact(id INT, timestamp TIMESTAMP,
-# user_id INT, movie_id INT, rating INT)
+#hive -e "CREATE EXTERNAL TABLE IF NOT EXISTS user_rating_fact(
+#  id INT,
+#  timestamp TIMESTAMP,
+#  user_id INT,
+#  movie_id INT,
+#  rating INT)
 #ROW FORMAT SERDE 'parquet.hive.serde.ParquetHiveSerDe'
 #STORED AS
 #INPUTFORMAT 'parquet.hive.DeprecatedParquetInputFormat'
