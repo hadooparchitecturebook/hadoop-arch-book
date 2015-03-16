@@ -64,9 +64,11 @@ INPUTFORMAT 'parquet.hive.DeprecatedParquetInputFormat'
 OUTPUTFORMAT 'parquet.hive.DeprecatedParquetOutputFormat'
 LOCATION '/data/movielens/user_${DT}'"
 
-sqoop job --delete user_upserts_import --meta-connect jdbc:hsqldb:hsql://${SQOOP_METASTORE_HOST}:16000/sqoop
+sqoop job --delete user_upserts_import --meta-connect \
+jdbc:hsqldb:hsql://${SQOOP_METASTORE_HOST}:16000/sqoop
 
-#Couldn't do Parquet because there are some bugs related to incremental import and Parquet integration
+# Couldn't do Parquet because there are some bugs related to incremental import
+# and Parquet integration
 sqoop job --create user_upserts_import --meta-connect \
 jdbc:hsqldb:hsql://${SQOOP_METASTORE_HOST}:16000/sqoop \
 -- import --connect jdbc:mysql://mgrover-haa-2.vpc.cloudera.com:3306/oltp --username root \
@@ -79,7 +81,8 @@ JOIN occupation ON (user.occupation_id = occupation.id)
 WHERE ${CONDITIONS}' \
 --target-dir /etl/movielens/user_upserts
 
-sqoop job -exec user_upserts_import --meta-connect jdbc:hsqldb:hsql://${SQOOP_METASTORE_HOST}:16000/sqoop
+sqoop job -exec user_upserts_import --meta-connect \
+jdbc:hsqldb:hsql://${SQOOP_METASTORE_HOST}:16000/sqoop
 
 hive -e "
 INSERT OVERWRITE TABLE user_tmp
@@ -102,7 +105,10 @@ YEAR=$(date "+%Y")
 MONTH=$(date "+%m")
 DAY=$(date "+%d")
 
-sudo -u hdfs hadoop fs -mkdir -p /data/movielens/user_history/year=${YEAR}/month=${MONTH}/day=${DAY}
-sudo -u hdfs hadoop fs -mv /etl/movielens/user_upserts/* /data/movielens/user_history/year=${YEAR}/month=${MONTH}/day=${DAY}
+sudo -u hdfs hadoop fs -mkdir -p \
+/data/movielens/user_history/year=${YEAR}/month=${MONTH}/day=${DAY}
+sudo -u hdfs hadoop fs -mv /etl/movielens/user_upserts/* \
+/data/movielens/user_history/year=${YEAR}/month=${MONTH}/day=${DAY}
 
-hive -e "ALTER TABLE user_history ADD PARTITION (year=${YEAR}, month=${MONTH}, day=${DAY})"
+hive -e "ALTER TABLE user_history 
+ADD PARTITION (year=${YEAR}, month=${MONTH}, day=${DAY})"

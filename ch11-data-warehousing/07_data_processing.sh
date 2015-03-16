@@ -1,9 +1,9 @@
 #!/bin/bash
 sudo -u hdfs hadoop fs -mkdir -p  /data/movielens/user_rating
 sudo -u hdfs hadoop fs -chown -R ${USER}: /data/movielens/user_rating
-# user_rating that compacts user_rating_fact to a single rating per user per movie
-# No need for id's here, since multiple user_rating_fact id's would potentially get squashed into 1
-# in this table, anyways.
+# Compact user_rating_fact to a single rating per user per movie
+# No need for id's here, since multiple user_rating_fact id's would potentially
+# get squashed into 1 in this table, anyways.
 hive -e "CREATE EXTERNAL TABLE IF NOT EXISTS user_rating(
   user_id INT,
   movie_id INT,
@@ -21,8 +21,10 @@ INSERT INTO TABLE user_rating
 SELECT
   user_id,
   movie_id,
-  SPLIT(MAX(CONCAT(FROM_UNIXTIME(INT(timestamp/1000)), ',', rating)), ',')[1] AS rating,
-  SPLIT(MAX(CONCAT(FROM_UNIXTIME(INT(timestamp/1000)), ',', rating)), ',')[0] AS last_modified
+  SPLIT(MAX(CONCAT(FROM_UNIXTIME(INT(timestamp/1000)), ',', rating)), ',')[1]
+    AS rating,
+  SPLIT(MAX(CONCAT(FROM_UNIXTIME(INT(timestamp/1000)), ',', rating)), ',')[0]
+    AS last_modified
 FROM
   user_rating_fact
 GROUP BY

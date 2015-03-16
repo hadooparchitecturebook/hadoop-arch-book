@@ -1,5 +1,6 @@
 #!/bin/bash
-# This query creates a table that stores the number of times each user rated a particular movie
+# This query creates a table that stores the number of times each user 
+# rated a particular movie
 hive -e "
 CREATE TABLE user_movie_count AS
 SELECT
@@ -12,7 +13,8 @@ GROUP BY
   movie_id,
   user_id"
 
-# This query creates an aggregate table that stores the average movie rating for all movies
+# This query creates an aggregate table that stores 
+# the average movie rating for all movies
 hive -e "
 CREATE TABLE avg_movie_rating AS
 SELECT

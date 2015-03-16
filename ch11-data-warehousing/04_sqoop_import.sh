@@ -11,8 +11,8 @@ sudo -u hdfs hadoop fs -chown -R ${USER}: /user/${USER}
 
 # All nodes need to have access to the source database
 
-# Cleanup if necessary. Script should continue even if this next rm command fails.
-# Hence the last || :
+# Cleanup if necessary. Script should continue even if
+# this next rm command fails, hence the last || :
 sudo -u hdfs hadoop fs -rm -r /data/movielens/movie || :
 
 sqoop import --connect jdbc:mysql://mgrover-haa-2.vpc.cloudera.com:3306/oltp \
