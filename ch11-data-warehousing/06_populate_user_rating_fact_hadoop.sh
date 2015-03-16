@@ -35,5 +35,6 @@ jdbc:hsqldb:hsql://${SQOOP_METASTORE_HOST}:16000/sqoop \
 #OUTPUTFORMAT 'parquet.hive.DeprecatedParquetOutputFormat'
 #LOCATION '/data/movielens/user_rating_fact'"
 
-sqoop job -exec user_rating_import --meta-connect jdbc:hsqldb:hsql://${SQOOP_METASTORE_HOST}:16000/sqoop
+sqoop job -exec user_rating_import --meta-connect \
+jdbc:hsqldb:hsql://${SQOOP_METASTORE_HOST}:16000/sqoop
 
