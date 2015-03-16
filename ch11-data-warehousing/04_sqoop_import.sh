@@ -15,7 +15,8 @@ sudo -u hdfs hadoop fs -chown -R ${USER}: /user/${USER}
 # Hence the last || :
 sudo -u hdfs hadoop fs -rm -r /data/movielens/movie || :
 
-sqoop import --connect jdbc:mysql://mgrover-haa-2.vpc.cloudera.com:3306/oltp --username root --query \
+sqoop import --connect jdbc:mysql://mgrover-haa-2.vpc.cloudera.com:3306/oltp \
+--username root --query \
 'SELECT movie.*, group_concat(genre.name)
 FROM movie 
 JOIN movie_genre ON (movie.id = movie_genre.movie_id)
