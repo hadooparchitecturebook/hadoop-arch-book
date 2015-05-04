@@ -48,7 +48,7 @@ public class HBaseUtils {
   }
 
   public static void populateValidationRules(HConnection connection, ValidationRules rules) throws Exception {
-    HTableInterface table = connection.getTable(HBaseTableMetaModel.profileCacheTableName);
+    HTableInterface table = connection.getTable(HBaseTableMetaModel.validationRulesTableName);
 
     try {
       Put put = new Put(HBaseTableMetaModel.validationRulesRowKey);
