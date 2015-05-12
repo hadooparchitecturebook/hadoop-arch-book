@@ -23,8 +23,20 @@ FROM (
     MAX(UNIX_TIMESTAMP(ts,'dd/MMM/yyyy:HH:mm:ss')) - MIN(UNIX_TIMESTAMP(ts,'dd/MMM/yyyy:HH:mm:ss')) as session_duration,
     MIN(UNIX_TIMESTAMP(ts,'dd/MMM/yyyy:HH:mm:ss')) as session_start 
   FROM
-    sessionized_log
+    apache_log_parquet
   GROUP BY
     session_id)t
 GROUP BY
   HOUR(FROM_UNIXTIME(session_start));
+
+-- Average session length
+SELECT
+  AVG(session_length)/60 avg_min
+FROM (
+  SELECT
+    MAX(ts) - MIN(ts) session_length_in_sec
+  FROM
+    apache_log_parquet
+  GROUP BY
+    session_id
+  ) t;
