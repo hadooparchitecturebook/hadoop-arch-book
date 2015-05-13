@@ -1,0 +1,23 @@
+<workflow-app xmlns="uri:oozie:workflow:0.4" name="import-facts-wf">
+  <global>
+    <job-tracker>${jobTracker}</job-tracker>
+    <name-node>${nameNode}</name-node>
+  </global>
+  <start to="import_facts"/>
+  <action name="import_facts">
+    <sqoop xmlns="uri:oozie:sqoop-action:0.2">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <command>job -exec user_rating_import \
+      --meta-connect jdbc:hsqldb:hsql://edgenode:16000/sqoop</command>
+      <archive>/tmp/mysql-connector-java.jar#mysql-connector-java.jar</archive>
+      <file>/tmp/hive-site.xml#hive-site.xml</file>
+    </sqoop>
+    <ok to="end"/>
+   <error to="kill"/>
+  </action>
+  <kill name="kill">
+  <message>Workflow failed:[${wf:errorMessage(wf:lastErrorNode())}]</message>
+  </kill>
+  <end name="end"/>
+</workflow-app>
