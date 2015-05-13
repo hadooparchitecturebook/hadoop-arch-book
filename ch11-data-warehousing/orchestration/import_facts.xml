@@ -5,9 +5,7 @@
   </global>
   <start to="import_facts"/>
   <action name="import_facts">
-    <sqoop xmlns="uri:oozie:sqoop-action:0.2">
-      <job-tracker>${jobTracker}</job-tracker>
-      <name-node>${nameNode}</name-node>
+    <sqoop xmlns="uri:oozie:sqoop-action:0.4">
       <command>job -exec user_rating_import \
       --meta-connect jdbc:hsqldb:hsql://edgenode:16000/sqoop</command>
       <archive>/tmp/mysql-connector-java.jar#mysql-connector-java.jar</archive>
