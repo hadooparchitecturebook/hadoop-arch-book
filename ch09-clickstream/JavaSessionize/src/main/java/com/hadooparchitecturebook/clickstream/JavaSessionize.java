@@ -32,7 +32,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.Date;
 
-import com.google.common.io.Files ;
+import com.google.common.io.Files;
+
 import java.io.File;
 import java.io.ObjectStreamException;
 
@@ -53,13 +54,11 @@ public final class JavaSessionize {
     );
 
 
-
-
     public static final Pattern apacheLogRegex = Pattern.compile(
             "(\\d+.\\d+.\\d+.\\d+).*\\[(.*)\\].*GET (\\S+) \\S+ (\\d+) (\\d+) (\\S+) (.*)");
 
     public static File temp = Files.createTempDir();
-    public static String outputPath = new File(temp,"output").getAbsolutePath();
+    public static String outputPath = new File(temp, "output").getAbsolutePath();
 
     public static class SerializableLogLine extends LogLine implements Serializable {
 
@@ -104,8 +103,7 @@ public final class JavaSessionize {
                 if (this.getTimestamp() < that.getTimestamp()) return -1;
                 if (this.getTimestamp() > that.getTimestamp()) return 1;
                 return 0;
-            }
-            else {
+            } else {
                 throw new IllegalArgumentException("Can only compare two LogLines");
             }
         }
@@ -127,9 +125,9 @@ public final class JavaSessionize {
     }
 
     // get the IP of the click event, to use as a user identified
-    public static String getIP(String line){
-        System.out.println("Line:" + line)  ;
-        System.out.println("regex:" + apacheLogRegex)  ;
+    public static String getIP(String line) {
+        System.out.println("Line:" + line);
+        System.out.println("regex:" + apacheLogRegex);
         Matcher m = apacheLogRegex.matcher(line);
         if (m.find())
             return m.group(1);
@@ -149,10 +147,10 @@ public final class JavaSessionize {
             String url = m.group(3);
             String referrer = m.group(6);
             String userAgent = m.group(7);
-            return new SerializableLogLine(new LogLine(ip,timeStamp.getTime(),url,referrer,userAgent,0));
+            return new SerializableLogLine(new LogLine(ip, timeStamp.getTime(), url, referrer, userAgent, 0));
         } else {
             System.out.println("no match");
-            return new SerializableLogLine(new LogLine("0",new Date().getTime(),"","","",0));
+            return new SerializableLogLine(new LogLine("0", new Date().getTime(), "", "", "", 0));
         }
     }
 
@@ -161,11 +159,11 @@ public final class JavaSessionize {
         Collections.sort(sessionizedLines);
         int sessionId = 0;
         sessionizedLines.get(0).setSessionid(sessionId);
-        for (int i=1; i<sessionizedLines.size();i++) {
+        for (int i = 1; i < sessionizedLines.size(); i++) {
             SerializableLogLine thisLine = sessionizedLines.get(i);
-            SerializableLogLine prevLine = sessionizedLines.get(i-1);
+            SerializableLogLine prevLine = sessionizedLines.get(i - 1);
 
-            if (thisLine.getTimestamp() - prevLine.getTimestamp() > 30*60*1000) {
+            if (thisLine.getTimestamp() - prevLine.getTimestamp() > 30 * 60 * 1000) {
                 sessionId++;
             }
             thisLine.setSessionid(sessionId);
@@ -180,26 +178,26 @@ public final class JavaSessionize {
             System.exit(1);
         }
 
-        System.out.println("Output:"+outputPath);
+        System.out.println("Output:" + outputPath);
 
         JavaSparkContext jsc = new JavaSparkContext(args[0],
                 "JavaSessionize",
                 System.getenv("SPARK_HOME"),
                 JavaSparkContext.jarOfClass(JavaSessionize.class));
 
-        JavaRDD < String > dataSet = (args.length == 2) ? jsc.textFile(args[1]) : jsc.parallelize(testLines);
+        JavaRDD<String> dataSet = (args.length == 2) ? jsc.textFile(args[1]) : jsc.parallelize(testLines);
 
-        JavaPairRDD<String,SerializableLogLine>  parsed = dataSet.map(new PairFunction<String, String, SerializableLogLine>() {
+        JavaPairRDD<String, SerializableLogLine> parsed = dataSet.map(new PairFunction<String, String, SerializableLogLine>() {
             @Override
             public Tuple2<String, SerializableLogLine> call(String s) throws Exception {
-                return new Tuple2<String,SerializableLogLine>(getIP(s),getFields(s));
+                return new Tuple2<String, SerializableLogLine>(getIP(s), getFields(s));
             }
         });
 
         // This groups clicks by IP address
-        JavaPairRDD<String,List<SerializableLogLine>> grouped = parsed.groupByKey();
+        JavaPairRDD<String, List<SerializableLogLine>> grouped = parsed.groupByKey();
 
-        JavaPairRDD<String,List<SerializableLogLine>> sessionized = grouped.mapValues(new Function<List<SerializableLogLine>, List<SerializableLogLine>>() {
+        JavaPairRDD<String, List<SerializableLogLine>> sessionized = grouped.mapValues(new Function<List<SerializableLogLine>, List<SerializableLogLine>>() {
             @Override
             public List<SerializableLogLine> call(List<SerializableLogLine> logLines) throws Exception {
                 return sessionize(logLines);
@@ -210,7 +208,7 @@ public final class JavaSessionize {
             @Override
             public void call(Tuple2<String, List<SerializableLogLine>> stringListTuple2) throws Exception {
                 System.out.println("IP: " + stringListTuple2._1());
-                for(SerializableLogLine line: stringListTuple2._2()){
+                for (SerializableLogLine line : stringListTuple2._2()) {
                     System.out.println(line);
                 }
             }
@@ -233,12 +231,12 @@ public final class JavaSessionize {
             public Iterable<SerializableLogLine> call(List<SerializableLogLine> serializableLogLines) throws Exception {
                 return serializableLogLines;
             }
-        }) ;
+        });
 
-        JavaPairRDD<Void,SerializableLogLine> outputPairs = flatLines.map(new PairFunction<SerializableLogLine, Void, SerializableLogLine>() {
+        JavaPairRDD<Void, SerializableLogLine> outputPairs = flatLines.map(new PairFunction<SerializableLogLine, Void, SerializableLogLine>() {
             @Override
             public Tuple2<Void, SerializableLogLine> call(SerializableLogLine serializableLogLine) throws Exception {
-                return new Tuple2<Void, SerializableLogLine>(null,serializableLogLine);
+                return new Tuple2<Void, SerializableLogLine>(null, serializableLogLine);
             }
         });
 
@@ -255,11 +253,10 @@ public final class JavaSessionize {
         //        " job schema - " +  job.getConfiguration().get("parquet.avro.schema"))  ;
 
         outputPairs.saveAsNewAPIHadoopFile(outputPath,    //path
-                        Void.class,               //key class
-                        LogLine.class,                    //value class
-                        pOutput.getClass(),               //output format class
-                        job.getConfiguration());          //configuration
-
+                Void.class,               //key class
+                LogLine.class,                    //value class
+                pOutput.getClass(),               //output format class
+                job.getConfiguration());          //configuration
 
 
     }
