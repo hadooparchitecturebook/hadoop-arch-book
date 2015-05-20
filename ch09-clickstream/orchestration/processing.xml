@@ -33,7 +33,7 @@
   </action>
 
   <kill name="fail">
-    <message> workflow failed: [${wf:errorMessage(wf:lastErrorNode())}] </message>
+    <message>Workflow failed:[${wf:errorMessage(wf:lastErrorNode())}]</message>
   </kill>
   <end name="end"/>
 
