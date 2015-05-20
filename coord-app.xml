@@ -1,0 +1,50 @@
+<coordinator-app name="prepare-clickstream" frequency="${coord:days(1)}"
+                 start="${jobStart}" end="${jobEnd}"
+                 timezone="UTC"
+                 xmlns="uri:oozie:coordinator:0.1">
+
+  <datasets>
+    <dataset name="rawlogs" frequency="${coord:days(1)}"
+             initial-instance="${initialDataset}" timezone="America/Los_Angeles">
+      <uri-template>/etl/BI/casualcyclist/clicks/rawlogs/year=${YEAR}/month=${MONTH}/day=${DAY}</uri-template>
+      <done-flag></done-flag>
+    </dataset>
+  </datasets>
+
+  <input-events>
+    <data-in name="input" dataset="rawlogs">
+      <instance>${coord:current(0}</instance>
+    </data-in>
+    <data-in name="readyIndicator" dataset="rawlogs">
+      <!-- Since Flume doesn't set a readyness flag when it finishes writing
+           to a directory we can just use the next directory as an input event,
+           which instructs Oozie not to kick off a coordinator
+           action until the next day of data starts being available. -->
+      <instance>${coord:current(1)}</instance>
+    </data-in>
+  </input-events>
+
+  <action>
+    <workflow>
+      <app-path>${workflowRoot}/processing.xml</app-path>
+      <configuration>
+        <property>
+          <name>wfInput</name>
+          <value>${coord:dataIn('input')}</value>
+        </property>
+        <property>
+          <name>wfYear</name>
+          <value>${coord:formatTime(coord:dateOffset(coord:nominalTime(), tzOffset, 'HOUR'), 'yyyy')}</value>
+        </property>
+        <property>
+          <name>wfMonth</name>
+          <value>${coord:formatTime(coord:dateOffset(coord:nominalTime(), tzOffset, 'HOUR'), 'MM')}</value>
+        </property>
+        <property>
+          <name>wfDay</name>
+          <value>${coord:formatTime(coord:dateOffset(coord:nominalTime(), tzOffset, 'HOUR'), 'dd')}</value>
+        </property>
+      </configuration>
+    </workflow>
+  </action>
+</coordinator-app>

@@ -1,0 +1,40 @@
+<workflow-app xmlns="uri:oozie:workflow:0.4" name="process-clickstream-data-wf">
+  <global>
+    <job-tracker>${jobTracker}</job-tracker>
+    <name-node>${nameNode}</name-node>
+  </global>
+  <start to="dedup"/>
+  <action name="dedup">
+    <pig>
+      <prepare>
+        <delete path="${dedupPath}"/>
+      </prepare>
+      <script>dedup.pig</script>
+      <argument>-param</argument>
+      <argument>raw_log_dir='${wfInput}'</argument>
+      <argument>-param</argument>
+      <argument>deduped_log_dir='/etl/BI/casualcyclist/clicks/deduplogs/year=${wfYear}/month=${wfMonth}/day=${wfDay}'</argument>
+    </pig>
+    <ok to="sessionize"/>
+    <error to="fail"/>
+  </action>
+  
+  <action name="sessionize">
+  <java>
+    <prepare>
+      <delete path="${sessionPath}"/>
+    </prepare>
+    <main-class>com.hadooparchitecturebook.MRSessionize</main-class>
+    <arg>${dedupPath}</arg>
+    <arg>${sessionPath}</arg>
+  </java>
+  <ok to="end"/>
+  <error to="fail"/>
+  </action>
+
+  <kill name="fail">
+    <message> workflow failed: [${wf:errorMessage(wf:lastErrorNode())}] </message>
+  </kill>
+  <end name="end"/>
+
+</workflow-app>
