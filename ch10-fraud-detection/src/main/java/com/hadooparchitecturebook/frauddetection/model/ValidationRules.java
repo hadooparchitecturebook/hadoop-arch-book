@@ -51,7 +51,7 @@ public class ValidationRules {
 
   public ValidationRules(JSONObject jsonObject)  throws JSONException {
     if (jsonObject != null) {
-      JSONArray jsonArray = jsonObject.getJSONArray("bannedVanderIds");
+      JSONArray jsonArray = jsonObject.getJSONArray("bannedVanderIdSet");
 
       for (int i = 0; i < jsonArray.length(); i++) {
         String bannedId = jsonArray.getString(i);
