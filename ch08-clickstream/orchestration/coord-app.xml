@@ -13,7 +13,7 @@
 
   <input-events>
     <data-in name="input" dataset="rawlogs">
-      <instance>${coord:current(0}</instance>
+      <instance>${coord:current(0)}</instance>
     </data-in>
     <data-in name="readyIndicator" dataset="rawlogs">
       <!-- Since Flume doesn't set a readyness flag when it finishes writing
