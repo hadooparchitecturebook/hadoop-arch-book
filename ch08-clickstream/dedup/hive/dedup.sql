@@ -6,7 +6,7 @@ SELECT
   referrer,
   user_agent,
   YEAR(FROM_UNIXTIME(unix_ts)) year,
-  MONTH(FROM_UNIXTIME(ts)) month
+  MONTH(FROM_UNIXTIME(unix_ts)) month
 FROM (
   SELECT
     ip,
